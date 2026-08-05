@@ -649,7 +649,7 @@ function renderDietMeals() {
 
             ${activeRole === 'nutri' ? `
               <button type="button" class="btn-secondary btn-sm" onclick="window.addFoodToMeal('${mealId}')" title="Adicionar alimento nesta refeição">
-                <i class="fa-solid fa-plus"></i> Alimento
+                <i class="fa-solid fa-arrow-rotate-right"></i> Substituir / + Alimento
               </button>
             ` : ''}
 
@@ -706,7 +706,7 @@ function renderDietMeals() {
                     <td style="padding: 0.6rem 0.8rem; text-align: center; color: #c084fc;">${food.fats || 0}g</td>
                     ${activeRole === 'nutri' ? `
                       <td style="padding: 0.6rem 0.8rem; text-align: center;">
-                        <button type="button" class="btn-remove-food" onclick="window.deleteFoodFromMeal('${mealId}', ${fIdx})" title="Remover este alimento">
+                        <button type="button" class="btn-sm btn-secondary" onclick="window.openFoodSubstitutionModal('${mealId}', ${fIdx})" title="Substituir por outro alimento da base" style="font-size:0.7rem; padding: 2px 6px; margin-right:4px;"><i class="fa-solid fa-arrow-rotate-right"></i> Substituir</button><button type="button" class="btn-remove-food" onclick="window.deleteFoodFromMeal('${mealId}', ${fIdx})" title="Remover este alimento">
                           <i class="fa-solid fa-trash-can"></i>
                         </button>
                       </td>
@@ -737,7 +737,8 @@ window.deleteFoodFromMeal = function(mealId, foodIndex) {
   }
 };
 
-window.addFoodToMeal = function(mealId) {
+window.addFoodToMeal = function(mealId) { window.openFoodSubstitutionModal(mealId, -1); };
+window.old_addFoodToMeal = function(mealId) {
   const activeRole = (typeof window.getUserRole === 'function') ? window.getUserRole() : 'patient';
   if (activeRole === 'patient') return;
 
@@ -4309,4 +4310,196 @@ window.showNutritionLabelModal = function(foodId) {
   `;
 
   document.body.insertAdjacentHTML('beforeend', modalHtml);
+};
+
+
+// ==========================================================================
+// MODAL INTERATIVO DE SUBSTITUIÇÃO E INCLUSÃO DE ALIMENTOS DA BASE
+// ==========================================================================
+window.openFoodSubstitutionModal = function(mealId, foodIndex = -1) {
+  const targetList = (AppData.prescribedMeals && AppData.prescribedMeals.length > 0) ? AppData.prescribedMeals : AppData.meals;
+  const meal = targetList.find(m => m.id === mealId);
+  if (!meal) return;
+
+  const currentFoods = meal.foods || meal.items || [];
+  const foodToReplace = (foodIndex >= 0 && currentFoods[foodIndex]) ? currentFoods[foodIndex] : null;
+
+  const database = window.expandedTacoDatabase || [];
+
+  // Group database foods by category
+  const categories = {};
+  database.forEach(item => {
+    const cat = item.category || 'Outros';
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push(item);
+  });
+
+  let selectOptionsHtml = Object.keys(categories).map(cat => {
+    const items = categories[cat].map(item => 
+      `<option value="${item.id}">${item.name} (${item.portion} - ${item.kcal} kcal, ${item.protein}g P, ${item.carbs}g C, ${item.fats}g G) [${item.source}]</option>`
+    ).join('');
+    return `<optgroup label="📂 ${cat}">${items}</optgroup>`;
+  }).join('');
+
+  const modalHtml = `
+    <div id="food-substitution-modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 10000;" onclick="this.remove()">
+      <div class="card glass-card glow-purple" style="max-width: 520px; width: 92%; padding: 1.5rem; background: #0f172a; border: 1px solid rgba(168,85,247,0.4);" onclick="event.stopPropagation()">
+        
+        <div class="flex-between align-center margin-bottom-sm">
+          <h3 style="color: #c084fc; font-size: 1.15rem; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-arrow-rotate-right"></i> ${foodToReplace ? 'Substituir Alimento na Refeição' : 'Adicionar Alimento na Refeição'}
+          </h3>
+          <button type="button" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;" onclick="this.closest('#food-substitution-modal-backdrop').remove()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <p style="font-size: 0.8rem; color: #cbd5e1; margin-top: 0; margin-bottom: 1rem;">
+          Refeição: <strong style="color: #f8fafc;">${meal.title || meal.name}</strong> 
+          ${foodToReplace ? `| Substituindo: <span class="badge-status warning">${foodToReplace.name}</span>` : ''}
+        </p>
+
+        <!-- SELECT LISTA SUSPENSA DE TODOS OS ALIMENTOS -->
+        <div class="form-group margin-bottom">
+          <label style="color: #c084fc; font-weight: 600; font-size: 0.82rem;"><i class="fa-solid fa-list text-purple"></i> Selecione o Alimento da Base de Dados (TACO/TBCA/USDA/Rótulos)</label>
+          <select id="substitute-food-select" class="form-input-cyber" style="width: 100%; background: #1e293b; color: #fff; padding: 0.65rem; border-radius: 8px; border: 1px solid rgba(168,85,247,0.4);" onchange="window.updateSubstituteModalMacroPreview()">
+            ${selectOptionsHtml}
+          </select>
+        </div>
+
+        <!-- GRAMATURA E QUANTIDADE -->
+        <div class="nutri-form-grid margin-bottom">
+          <div class="form-group col-span-6">
+            <label style="color: #60a5fa; font-weight: 600; font-size: 0.82rem;"><i class="fa-solid fa-weight-scale"></i> Gramas / Porção em g</label>
+            <input type="number" id="substitute-grams-input" value="100" min="1" max="2000" style="width: 100%; background: #1e293b; color: #fff; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(96,165,250,0.4);" oninput="window.updateSubstituteModalMacroPreview()">
+          </div>
+          <div class="form-group col-span-6">
+            <label style="color: #34d399; font-weight: 600; font-size: 0.82rem;"><i class="fa-solid fa-tag"></i> Descrição da Porção</label>
+            <input type="text" id="substitute-portion-text" value="100g" placeholder="ex: 100g ou 2 fatias" style="width: 100%; background: #1e293b; color: #fff; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(52,211,153,0.4);">
+          </div>
+        </div>
+
+        <!-- MACRO PREVIEW CARD -->
+        <div id="substitute-macro-preview-box" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem; margin-bottom: 1.25rem;">
+          <small style="color: #cbd5e1; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Valores Nutricionais Calculados Proporcionalmente:</small>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+            <span style="color: #fbbf24; font-weight: 700; font-size: 0.95rem;" id="prev-kcal">0 kcal</span>
+            <span style="color: #34d399; font-weight: 700; font-size: 0.85rem;" id="prev-prot">0g Prot</span>
+            <span style="color: #22d3ee; font-weight: 700; font-size: 0.85rem;" id="prev-carb">0g Carb</span>
+            <span style="color: #c084fc; font-weight: 700; font-size: 0.85rem;" id="prev-fat">0g Gord</span>
+          </div>
+        </div>
+
+        <!-- BUTTONS -->
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn-primary" style="flex: 1; padding: 0.75rem;" onclick="window.confirmFoodSubstitution('${mealId}', ${foodIndex})">
+            <i class="fa-solid fa-check"></i> ${foodToReplace ? 'Confirmar Substituição' : 'Adicionar à Refeição'}
+          </button>
+          <button type="button" class="btn-secondary" style="padding: 0.75rem;" onclick="this.closest('#food-substitution-modal-backdrop').remove()">
+            Cancelar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  window.updateSubstituteModalMacroPreview();
+};
+
+window.updateSubstituteModalMacroPreview = function() {
+  const select = document.getElementById('substitute-food-select');
+  const gramsInput = document.getElementById('substitute-grams-input');
+  const portionInput = document.getElementById('substitute-portion-text');
+  if (!select || !gramsInput) return;
+
+  const foodId = select.value;
+  const grams = parseFloat(gramsInput.value) || 100;
+
+  const database = window.expandedTacoDatabase || [];
+  const food = database.find(f => f.id === foodId);
+  if (!food) return;
+
+  let baseGrams = 100;
+  if (food.portion) {
+    const match = food.portion.match(/(\d+)g/);
+    if (match) baseGrams = parseFloat(match[1]) || 100;
+  }
+
+  const factor = grams / baseGrams;
+
+  const kcal = Math.round(food.kcal * factor);
+  const prot = (food.protein * factor).toFixed(1);
+  const carb = (food.carbs * factor).toFixed(1);
+  const fat = (food.fats * factor).toFixed(1);
+
+  const prevKcal = document.getElementById('prev-kcal');
+  const prevProt = document.getElementById('prev-prot');
+  const prevCarb = document.getElementById('prev-carb');
+  const prevFat = document.getElementById('prev-fat');
+
+  if (prevKcal) prevKcal.innerText = kcal + ' kcal';
+  if (prevProt) prevProt.innerText = prot + 'g Prot';
+  if (prevCarb) prevCarb.innerText = carb + 'g Carb';
+  if (prevFat) prevFat.innerText = fat + 'g Gord';
+};
+
+window.confirmFoodSubstitution = function(mealId, foodIndex) {
+  const select = document.getElementById('substitute-food-select');
+  const gramsInput = document.getElementById('substitute-grams-input');
+  const portionInput = document.getElementById('substitute-portion-text');
+  if (!select) return;
+
+  const foodId = select.value;
+  const grams = parseFloat(gramsInput.value) || 100;
+  const portionText = (portionInput && portionInput.value) ? portionInput.value : (grams + 'g');
+
+  const database = window.expandedTacoDatabase || [];
+  const food = database.find(f => f.id === foodId);
+  if (!food) return;
+
+  let baseGrams = 100;
+  if (food.portion) {
+    const match = food.portion.match(/(\d+)g/);
+    if (match) baseGrams = parseFloat(match[1]) || 100;
+  }
+
+  const factor = grams / baseGrams;
+  const kcal = Math.round(food.kcal * factor);
+  const prot = parseFloat((food.protein * factor).toFixed(1));
+  const carb = parseFloat((food.carbs * factor).toFixed(1));
+  const fat = parseFloat((food.fats * factor).toFixed(1));
+
+  const targetList = (AppData.prescribedMeals && AppData.prescribedMeals.length > 0) ? AppData.prescribedMeals : AppData.meals;
+  const meal = targetList.find(m => m.id === mealId);
+
+  if (meal) {
+    if (!meal.foods) meal.foods = meal.items || [];
+    
+    const newFoodObj = {
+      name: food.name,
+      qty: portionText,
+      kcal: kcal,
+      protein: prot,
+      carbs: carb,
+      fats: fat
+    };
+
+    if (foodIndex >= 0 && meal.foods[foodIndex]) {
+      // Replace existing food
+      meal.foods[foodIndex] = newFoodObj;
+    } else {
+      // Add as new food
+      meal.foods.push(newFoodObj);
+    }
+
+    DatabaseEngine.save();
+    if (typeof renderDietMeals === 'function') renderDietMeals();
+
+    const backdrop = document.getElementById('food-substitution-modal-backdrop');
+    if (backdrop) backdrop.remove();
+
+    alert(`✅ Alimento "${food.name}" aplicado à refeição com sucesso!`);
+  }
 };
