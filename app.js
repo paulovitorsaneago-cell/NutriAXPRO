@@ -568,7 +568,183 @@ function initCurrentDate() {
 }
 
 // RENDER DIET MEALS LIST
+
+
+// ==========================================================================
+// RENDERIZAÇÃO DO PLANO ALIMENTAR (LAYOUT HORIZONTAL & GESTÃO DINÂMICA)
+// ==========================================================================
 function renderDietMeals() {
+  const container = document.getElementById('meals-list');
+  if (!container) return;
+
+  // Use prescribedMeals if present, or default to AppData.meals
+  let mealsToRender = (AppData.prescribedMeals && AppData.prescribedMeals.length > 0) 
+    ? AppData.prescribedMeals 
+    : AppData.meals;
+
+  if (!mealsToRender || mealsToRender.length === 0) {
+    container.innerHTML = `
+      <div style="width: 100%; text-align: center; padding: 3rem; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: 16px;">
+        <i class="fa-solid fa-wand-magic-sparkles text-purple" style="font-size: 2.5rem; margin-bottom: 0.5rem;"></i>
+        <h3 style="color: #f8fafc; font-size: 1.1rem; margin-bottom: 0.25rem;">Nenhuma refeição na prescrição atual</h3>
+        <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 1rem;">Clique no botão "🤖 Gerar Rascunho com IA" para montar o cardápio automático ou em "＋ Adicionar Refeição".</p>
+      </div>
+    `;
+    return;
+  }
+
+  const activeRole = (typeof window.getUserRole === 'function') ? window.getUserRole() : 'patient';
+
+  container.innerHTML = mealsToRender.map((meal, index) => {
+    // Calculate Total Kcal and Macros for this meal
+    let actualKcal = 0;
+    let actualProtein = 0;
+    let actualCarbs = 0;
+    let actualFats = 0;
+
+    const foods = meal.foods || meal.items || [];
+    foods.forEach(f => {
+      actualKcal += (parseFloat(f.kcal) || 0);
+      actualProtein += (parseFloat(f.protein) || 0);
+      actualCarbs += (parseFloat(f.carbs) || 0);
+      actualFats += (parseFloat(f.fats) || 0);
+    });
+
+    actualKcal = Math.round(actualKcal);
+    actualProtein = parseFloat(actualProtein.toFixed(1));
+    actualCarbs = parseFloat(actualCarbs.toFixed(1));
+    actualFats = parseFloat(actualFats.toFixed(1));
+
+    const targetKcal = meal.targetKcal || 500;
+
+    // Calculate Thermometer
+    const thermo = window.calculateMealThermometer ? window.calculateMealThermometer(actualKcal, targetKcal) : { status: 'on-target', label: 'Ideal', color: '#10b981', percentage: 100 };
+
+    const mealTitle = meal.title || meal.name || ('Refeição ' + (index + 1));
+    const mealTime = meal.time || '12:00';
+    const mealId = meal.id || ('meal_' + index);
+
+    return `
+      <div class="meal-horizontal-card glow-purple" id="${mealId}">
+        <div>
+          <!-- HEADER DA REFEIÇÃO -->
+          <div class="meal-card-header-bar">
+            <div>
+              <h4 style="color: #f8fafc; font-size: 1rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-utensils text-purple"></i> ${mealTitle}
+              </h4>
+              <small style="color: #cbd5e1; font-size: 0.75rem;"><i class="fa-regular fa-clock"></i> ${mealTime} | Meta: ~${targetKcal} kcal</small>
+            </div>
+            ${activeRole === 'nutri' ? `
+              <button type="button" class="btn-text text-rose" onclick="window.deleteMealFromPrescription('${mealId}')" title="Excluir esta refeição" style="font-size: 0.85rem; padding: 2px 6px;">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            ` : ''}
+          </div>
+
+          <!-- TERMÔMETRO NUTRICIONAL DA REFEIÇÃO -->
+          <div class="diet-thermometer-container margin-bottom-sm">
+            <div style="display: flex; flex-direction: column; flex: 1;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.72rem; margin-bottom: 3px;">
+                <span style="color: #cbd5e1;">Aporte: <strong>${actualKcal} kcal</strong></span>
+                <span class="diet-thermometer-badge ${thermo.status}">${thermo.label} (${thermo.percentage}%)</span>
+              </div>
+              <div class="diet-thermometer-bar-wrapper">
+                <div class="diet-thermometer-fill" style="width: ${thermo.percentage}%; background: ${thermo.color};"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MACRO SUMMARY PILLS -->
+          <div style="display: flex; gap: 4px; font-size: 0.7rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+            <span class="macro-mini-pill p" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 700;">${actualProtein}g P</span>
+            <span class="macro-mini-pill c" style="background: rgba(6, 182, 212, 0.2); color: #22d3ee; font-weight: 700;">${actualCarbs}g C</span>
+            <span class="macro-mini-pill g" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-weight: 700;">${actualFats}g G</span>
+          </div>
+
+          <!-- FOODS LIST TABLE -->
+          <div style="max-height: 240px; overflow-y: auto; font-size: 0.78rem;">
+            ${foods.length === 0 ? `
+              <p style="color: #64748b; font-size: 0.75rem; font-style: italic; text-align: center; margin: 1rem 0;">Nenhum alimento cadastrado nesta refeição.</p>
+            ` : `
+              <table style="width: 100%; border-collapse: collapse;">
+                <tbody>
+                  ${foods.map((food, fIdx) => `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                      <td style="padding: 4px 0; color: #f8fafc; font-weight: 600;">${food.name}</td>
+                      <td style="padding: 4px 0; text-align: right; color: #94a3b8; white-space: nowrap;">${food.qty || (food.qtyGrams ? food.qtyGrams + 'g' : '')}</td>
+                      ${activeRole === 'nutri' ? `
+                        <td style="padding: 4px 0 4px 6px; text-align: right;">
+                          <button type="button" style="background:none; border:none; color:#f43f5e; cursor:pointer;" onclick="window.deleteFoodFromMeal('${mealId}', ${fIdx})">
+                            <i class="fa-solid fa-xmark"></i>
+                          </button>
+                        </td>
+                      ` : ''}
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `}
+          </div>
+        </div>
+
+        <!-- FOOTER BUTTONS -->
+        <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.75rem; display: flex; gap: 6px;">
+          ${activeRole === 'nutri' ? `
+            <button type="button" class="btn-secondary btn-sm" onclick="window.addFoodToMeal('${mealId}')" style="flex: 1; font-size: 0.75rem;">
+              <i class="fa-solid fa-plus"></i> Alimento
+            </button>
+          ` : ''}
+          <button type="button" class="btn-success btn-sm" onclick="logAndConfirmPrescribedMeal('${mealId}')" style="flex: 1; font-size: 0.75rem;">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Carregar Planilha
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// FOOD DELETION AND ADDITION FOR NUTRI
+window.deleteFoodFromMeal = function(mealId, foodIndex) {
+  const activeRole = (typeof window.getUserRole === 'function') ? window.getUserRole() : 'patient';
+  if (activeRole === 'patient') return;
+
+  const targetList = (AppData.prescribedMeals && AppData.prescribedMeals.length > 0) ? AppData.prescribedMeals : AppData.meals;
+  const meal = targetList.find(m => m.id === mealId);
+
+  if (meal && (meal.foods || meal.items)) {
+    const arr = meal.foods || meal.items;
+    arr.splice(foodIndex, 1);
+    DatabaseEngine.save();
+    renderDietMeals();
+  }
+};
+
+window.addFoodToMeal = function(mealId) {
+  const activeRole = (typeof window.getUserRole === 'function') ? window.getUserRole() : 'patient';
+  if (activeRole === 'patient') return;
+
+  const foodName = prompt('Digite o nome do alimento a ser adicionado:', 'Ovos mexidos');
+  if (!foodName) return;
+
+  const qty = prompt('Digite a quantidade/porção (ex: 150g ou 2 un):', '100g') || '100g';
+  const kcal = parseFloat(prompt('Calorias (kcal):', '150')) || 150;
+  const protein = parseFloat(prompt('Proteínas (g):', '12')) || 12;
+  const carbs = parseFloat(prompt('Carboidratos (g):', '0')) || 0;
+  const fats = parseFloat(prompt('Gorduras (g):', '10')) || 10;
+
+  const targetList = (AppData.prescribedMeals && AppData.prescribedMeals.length > 0) ? AppData.prescribedMeals : AppData.meals;
+  const meal = targetList.find(m => m.id === mealId);
+
+  if (meal) {
+    if (!meal.foods) meal.foods = meal.items || [];
+    meal.foods.push({ name: foodName, qty: qty, kcal: kcal, protein: protein, carbs: carbs, fats: fats });
+    DatabaseEngine.save();
+    renderDietMeals();
+  }
+};
+
+function old_renderDietMeals() {
   const container = document.getElementById('meals-list');
   if (!container) return;
 
@@ -3510,6 +3686,7 @@ window.generateInitialDietDraftWithAI = function() {
   // Save AI Generated Meals to AppData
   if (!AppData.prescribedMeals) AppData.prescribedMeals = [];
   AppData.prescribedMeals = aiMeals;
+  AppData.meals = aiMeals;
   DatabaseEngine.save();
 
   if (typeof renderDietMeals === 'function') renderDietMeals();
@@ -3541,6 +3718,8 @@ window.addNewMealToPrescription = function() {
   };
 
   AppData.prescribedMeals.push(newMeal);
+  if (!AppData.meals) AppData.meals = [];
+  AppData.meals.push(newMeal);
   DatabaseEngine.save();
 
   if (typeof renderDietMeals === 'function') renderDietMeals();
