@@ -507,6 +507,127 @@ a {
   display: block;
 }
 
+/* ========================================================================== */
+/* DESIGN SYSTEM CYBER-FUTURÍSTICO 360° (GLASSMORPHISM + NEON GLOW) */
+/* ========================================================================== */
+:root {
+  --cyber-primary: #10b981;
+  --cyber-primary-glow: rgba(16, 185, 129, 0.4);
+  --cyber-accent-purple: #a855f7;
+  --cyber-purple-glow: rgba(168, 85, 247, 0.4);
+  --cyber-accent-cyan: #06b6d4;
+  --cyber-cyan-glow: rgba(6, 182, 212, 0.4);
+  --cyber-accent-amber: #f59e0b;
+  --cyber-amber-glow: rgba(245, 158, 11, 0.4);
+  --cyber-glass-bg: rgba(15, 23, 42, 0.75);
+  --cyber-glass-border: rgba(255, 255, 255, 0.12);
+}
+
+.glass-card {
+  background: var(--cyber-glass-bg) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border: 1px solid var(--cyber-glass-border) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+  border-radius: var(--radius-xl, 16px) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.15) !important;
+  transform: translateY(-2px);
+}
+
+.glow-emerald {
+  border-left: 4px solid var(--cyber-primary) !important;
+  box-shadow: -4px 0 20px var(--cyber-primary-glow) !important;
+}
+
+.glow-purple {
+  border-left: 4px solid var(--cyber-accent-purple) !important;
+  box-shadow: -4px 0 20px var(--cyber-purple-glow) !important;
+}
+
+.glow-cyan {
+  border-left: 4px solid var(--cyber-accent-cyan) !important;
+  box-shadow: -4px 0 20px var(--cyber-cyan-glow) !important;
+}
+
+.badge-neon-emerald {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+  font-weight: 700;
+  border-radius: var(--radius-full);
+}
+
+.badge-neon-purple {
+  background: rgba(168, 85, 247, 0.18) !important;
+  color: #c084fc !important;
+  border: 1px solid rgba(168, 85, 247, 0.4) !important;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+  font-weight: 700;
+  border-radius: var(--radius-full);
+}
+
+.badge-neon-cyan {
+  background: rgba(6, 182, 212, 0.18) !important;
+  color: #22d3ee !important;
+  border: 1px solid rgba(6, 182, 212, 0.4) !important;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+  font-weight: 700;
+  border-radius: var(--radius-full);
+}
+
+/* RÓTULO NUTRICIONAL PADRÃO ANVISA MODAL */
+.nutrition-label-card {
+  background: #ffffff;
+  color: #000000;
+  border: 3px solid #000000;
+  padding: 1rem;
+  font-family: Arial, Helvetica, sans-serif;
+  max-width: 380px;
+  border-radius: 4px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.nutrition-label-header {
+  border-bottom: 8px solid #000000;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.nutrition-label-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.nutrition-label-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.nutrition-label-table th, .nutrition-label-table td {
+  padding: 3px 0;
+  border-bottom: 1px solid #000000;
+}
+
+.nutrition-label-table th {
+  text-align: left;
+}
+
+.nutrition-label-table tr.thick-row td {
+  border-bottom: 4px solid #000000;
+  font-weight: 800;
+}
+
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }

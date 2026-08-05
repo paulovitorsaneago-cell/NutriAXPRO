@@ -3098,6 +3098,7 @@ function initApp() {
   try { renderFoodDatalist98(); } catch(e) { console.error("Error rendering food datalist 98:", e); }
   try { renderAba08FullPrescriptionUI(); } catch(e) { console.error("Error rendering Aba08 UI:", e); }
   try { filterTacoFoodDatabaseUI(); } catch(e) { console.error("Error filtering TACO UI:", e); }
+  try { window.filterTacoFoodDatabaseUI(); } catch(e) {}
   try { calculateMetCaloricExpenditure(); } catch(e) { console.error("Error calculating METs:", e); }
   try { recalculateMsqScoreFromUI(); } catch(e) { console.error("Error recalculating MSQ score:", e); }
   try { initCharts(); } catch(e) { console.error("Error initializing charts:", e); }
@@ -3560,4 +3561,190 @@ window.deleteMealFromPrescription = function(mealId) {
     DatabaseEngine.save();
     if (typeof renderDietMeals === 'function') renderDietMeals();
   }
+};
+
+
+// ==========================================================================
+// EXPANSÃO DA BASE DE DADOS NUTRICIONAL (TACO + TBCA + USDA + RÓTULOS FIT)
+// ==========================================================================
+window.expandedTacoDatabase = [
+  // PROTEÍNAS & CARNES IN NATURA (TACO/TBCA)
+  { id: 'f001', name: 'Peito de frango grelhado sem pele', category: 'Proteínas', portion: '100g', kcal: 159, protein: 32.0, carbs: 0.0, fats: 2.5, fiber: 0, sodium: 60, source: 'TACO Unicamp' },
+  { id: 'f002', name: 'Ovos de galinha inteiros cozidos', category: 'Proteínas', portion: '100g (2 un)', kcal: 143, protein: 13.0, carbs: 0.8, fats: 9.5, fiber: 0, sodium: 140, source: 'TACO Unicamp' },
+  { id: 'f003', name: 'Patinho bovino moído grelhado', category: 'Proteínas', portion: '100g', kcal: 219, protein: 35.9, carbs: 0.0, fats: 7.3, fiber: 0, sodium: 65, source: 'TACO Unicamp' },
+  { id: 'f004', name: 'Filé de tilápia grelhado', category: 'Proteínas', portion: '100g', kcal: 128, protein: 26.0, carbs: 0.0, fats: 2.7, fiber: 0, sodium: 55, source: 'TACO Unicamp' },
+  { id: 'f005', name: 'Salmão fresco grelhado', category: 'Proteínas', portion: '100g', kcal: 206, protein: 22.0, carbs: 0.0, fats: 12.3, fiber: 0, sodium: 50, source: 'TBCA USP' },
+  { id: 'f006', name: 'Filé mignon bovino grelhado', category: 'Proteínas', portion: '100g', kcal: 220, protein: 32.8, carbs: 0.0, fats: 8.8, fiber: 0, sodium: 60, source: 'TBCA USP' },
+  { id: 'f007', name: 'Atum conservado em água', category: 'Proteínas', portion: '100g', kcal: 116, protein: 25.5, carbs: 0.0, fats: 1.0, fiber: 0, sodium: 320, source: 'TACO Unicamp' },
+  { id: 'f008', name: 'Carne moída acém magro cozido', category: 'Proteínas', portion: '100g', kcal: 212, protein: 30.2, carbs: 0.0, fats: 9.4, fiber: 0, sodium: 70, source: 'TACO Unicamp' },
+  { id: 'f009', name: 'Peito de peru defumado fatiado', category: 'Proteínas', portion: '100g', kcal: 104, protein: 21.0, carbs: 1.2, fats: 1.5, fiber: 0, sodium: 890, source: 'TBCA USP' },
+  { id: 'f010', name: 'Camarão rosa cozido', category: 'Proteínas', portion: '100g', kcal: 99, protein: 24.0, carbs: 0.2, fats: 0.3, fiber: 0, sodium: 140, source: 'TACO Unicamp' },
+
+  // CARBOIDRATOS & CEREAIS (TACO/TBCA/USDA)
+  { id: 'f011', name: 'Arroz integral cozido', category: 'Carboidratos', portion: '100g (3 col. sopa)', kcal: 124, protein: 2.6, carbs: 25.8, fats: 1.0, fiber: 2.7, sodium: 1, source: 'TACO Unicamp' },
+  { id: 'f012', name: 'Batata doce cozida com casca', category: 'Carboidratos', portion: '100g', kcal: 77, protein: 0.6, carbs: 18.4, fats: 0.1, fiber: 2.2, sodium: 10, source: 'TACO Unicamp' },
+  { id: 'f013', name: 'Aveia em flocos finos', category: 'Carboidratos', portion: '100g', kcal: 394, protein: 13.9, carbs: 66.6, fats: 8.5, fiber: 9.1, sodium: 4, source: 'TACO Unicamp' },
+  { id: 'f014', name: 'Mandioca / Aipim cozido', category: 'Carboidratos', portion: '100g', kcal: 125, protein: 0.6, carbs: 30.1, fats: 0.3, fiber: 1.6, sodium: 2, source: 'TACO Unicamp' },
+  { id: 'f015', name: 'Macarrão integral cozido', category: 'Carboidratos', portion: '100g', kcal: 124, protein: 5.3, carbs: 26.5, fats: 0.5, fiber: 3.2, sodium: 2, source: 'TBCA USP' },
+  { id: 'f016', name: 'Tapioca massa pronta (goma)', category: 'Carboidratos', portion: '100g', kcal: 240, protein: 0.2, carbs: 58.5, fats: 0.2, fiber: 0.5, sodium: 5, source: 'TBCA USP' },
+  { id: 'f017', name: 'Cuscuz de milho cozido', category: 'Carboidratos', portion: '100g', kcal: 112, protein: 2.2, carbs: 25.1, fats: 0.7, fiber: 1.8, sodium: 15, source: 'TACO Unicamp' },
+  { id: 'f018', name: 'Batata inglesa cozida', category: 'Carboidratos', portion: '100g', kcal: 52, protein: 1.2, carbs: 11.9, fats: 0.1, fiber: 1.3, sodium: 3, source: 'TACO Unicamp' },
+  { id: 'f019', name: 'Quinoa em grãos cozida', category: 'Carboidratos', portion: '100g', kcal: 120, protein: 4.4, carbs: 21.3, fats: 1.9, fiber: 2.8, sodium: 7, source: 'USDA' },
+
+  // LEGUMINOSAS (TACO/TBCA)
+  { id: 'f020', name: 'Feijão carioca cozido com caldo', category: 'Leguminosas', portion: '100g (1 concha)', kcal: 76, protein: 4.8, carbs: 13.6, fats: 0.5, fiber: 8.5, sodium: 2, source: 'TACO Unicamp' },
+  { id: 'f021', name: 'Feijão preto cozido com caldo', category: 'Leguminosas', portion: '100g', kcal: 77, protein: 4.5, carbs: 14.0, fats: 0.5, fiber: 8.4, sodium: 2, source: 'TACO Unicamp' },
+  { id: 'f022', name: 'Lentilha cozida', category: 'Leguminosas', portion: '100g', kcal: 93, protein: 6.3, carbs: 16.3, fats: 0.5, fiber: 7.9, sodium: 3, source: 'TACO Unicamp' },
+  { id: 'f023', name: 'Grão de bico cozido', category: 'Leguminosas', portion: '100g', kcal: 120, protein: 7.0, carbs: 20.0, fats: 2.0, fiber: 6.0, sodium: 4, source: 'TBCA USP' },
+
+  // RÓTULOS COMERCIAIS & SUPLÊMENTOS PROTEICOS (MODERN FIT BASE)
+  { id: 'f024', name: 'Whey Protein Concentrado 80% (Growth / Dux / Max)', category: 'Suplementos', portion: '30g (1 scoop)', kcal: 120, protein: 24.0, carbs: 3.0, fats: 2.0, fiber: 0, sodium: 55, source: 'Rótulos Fit' },
+  { id: 'f025', name: 'Whey Protein Isolado 90% (Growth / Dux)', category: 'Suplementos', portion: '30g (1 scoop)', kcal: 110, protein: 27.0, carbs: 0.5, fats: 0.2, fiber: 0, sodium: 40, source: 'Rótulos Fit' },
+  { id: 'f026', name: 'Creatina Monohidratada 100% Creapure', category: 'Suplementos', portion: '3g (1 scoop)', kcal: 0, protein: 0.0, carbs: 0.0, fats: 0.0, fiber: 0, sodium: 0, source: 'Rótulos Fit' },
+  { id: 'f027', name: 'Iogurte Proteico YoPRO Danone 15g Proteína', category: 'Suplementos', portion: '160g (1 unidade)', kcal: 100, protein: 15.0, carbs: 8.0, fats: 0.0, fiber: 0, sodium: 80, source: 'Rótulos Fit' },
+  { id: 'f028', name: 'Iogurte Nestlé Molico Protein 10g', category: 'Suplementos', portion: '170g (1 unidade)', kcal: 85, protein: 10.0, carbs: 11.0, fats: 0.0, fiber: 0, sodium: 95, source: 'Rótulos Fit' },
+  { id: 'f029', name: 'Bebida Proteica Verde Campo Lacfree 15g', category: 'Suplementos', portion: '250ml', kcal: 125, protein: 15.0, carbs: 12.0, fats: 1.0, fiber: 0, sodium: 110, source: 'Rótulos Fit' },
+  { id: 'f030', name: 'Barra de Proteína Bold Bar / Nutrata (20g Prot)', category: 'Suplementos', portion: '60g (1 barra)', kcal: 230, protein: 20.0, carbs: 18.0, fats: 7.0, fiber: 5.0, sodium: 120, source: 'Rótulos Fit' },
+  { id: 'f031', name: 'Pasta de Amendoim Integral 100% (Growth / Mandubim)', category: 'Gorduras', portion: '15g (1 colher)', kcal: 90, protein: 4.2, carbs: 3.1, fats: 7.5, fiber: 1.2, sodium: 0, source: 'Rótulos Fit' },
+  { id: 'f032', name: 'Pasta de Amendoim com Whey & Cacau (Dr. Peanut)', category: 'Gorduras', portion: '15g (1 colher)', kcal: 87, protein: 5.0, carbs: 4.0, fats: 6.2, fiber: 1.0, sodium: 10, source: 'Rótulos Fit' },
+  { id: 'f033', name: 'Pão de Forma 100% Integral Wickbold / Nutrella', category: 'Carboidratos', portion: '50g (2 fatias)', kcal: 118, protein: 5.4, carbs: 21.0, fats: 1.4, fiber: 4.2, sodium: 190, source: 'Rótulos Fit' },
+  { id: 'f034', name: 'Requeijão Cremoso Light Poços de Caldas', category: 'Laticínios', portion: '30g (1 colher sopa)', kcal: 46, protein: 3.6, carbs: 1.2, fats: 3.0, fiber: 0, sodium: 130, source: 'Rótulos Fit' },
+  { id: 'f035', name: 'Queijo Cottage Zero Lactose Verde Campo', category: 'Laticínios', portion: '50g (2 colheres)', kcal: 45, protein: 6.5, carbs: 1.5, fats: 1.2, fiber: 0, sodium: 140, source: 'Rótulos Fit' },
+  { id: 'f036', name: 'Leite de Amêndoas Silk Zero Açúcar', category: 'Laticínios', portion: '200ml (1 copo)', kcal: 26, protein: 1.0, carbs: 0.2, fats: 2.2, fiber: 0.8, sodium: 130, source: 'Rótulos Fit' },
+  { id: 'f037', name: 'Azeite de Oliva Extra Virgem Borgers / Andorinha', category: 'Gorduras', portion: '10ml (1 colher)', kcal: 88, protein: 0.0, carbs: 0.0, fats: 10.0, fiber: 0, sodium: 0, source: 'TACO Unicamp' },
+
+  // FRUTAS, VEGETAIS & OLEAGINOSAS
+  { id: 'f038', name: 'Banana prata in natura', category: 'Frutas', portion: '100g (1 un média)', kcal: 89, protein: 1.3, carbs: 22.8, fats: 0.3, fiber: 2.0, sodium: 1, source: 'TACO Unicamp' },
+  { id: 'f039', name: 'Maçã Fuji com casca', category: 'Frutas', portion: '100g (1 un média)', kcal: 56, protein: 0.3, carbs: 15.2, fats: 0.2, fiber: 2.4, sodium: 1, source: 'TACO Unicamp' },
+  { id: 'f040', name: 'Abacate fresco', category: 'Frutas', portion: '100g', kcal: 96, protein: 1.2, carbs: 6.0, fats: 8.4, fiber: 6.3, sodium: 2, source: 'TACO Unicamp' },
+  { id: 'f041', name: 'Brócolis cozido no vapor', category: 'Vegetais', portion: '100g', kcal: 35, protein: 3.3, carbs: 6.6, fats: 0.4, fiber: 3.4, sodium: 12, source: 'TACO Unicamp' },
+  { id: 'f042', name: 'Castanha do Pará / Castanha do Brasil', category: 'Gorduras', portion: '15g (3 un)', kcal: 98, protein: 2.2, carbs: 1.8, fats: 9.9, fiber: 1.2, sodium: 0, source: 'TACO Unicamp' }
+];
+
+window.filterTacoFoodDatabaseUI = function() {
+  const search = (document.getElementById('taco-search-input')?.value || '').toLowerCase().trim();
+  const category = document.getElementById('taco-category-filter')?.value || 'TODAS';
+  const source = document.getElementById('taco-source-filter')?.value || 'TODAS';
+
+  let list = window.expandedTacoDatabase || [];
+
+  if (category !== 'TODAS') {
+    list = list.filter(f => f.category === category);
+  }
+
+  if (source !== 'TODAS') {
+    if (source === 'rotulos') {
+      list = list.filter(f => f.source === 'Rótulos Fit');
+    } else if (source === 'suplementos') {
+      list = list.filter(f => f.category === 'Suplementos' || f.name.toLowerCase().includes('whey') || f.name.toLowerCase().includes('creatina'));
+    } else {
+      list = list.filter(f => f.source.toLowerCase().includes(source));
+    }
+  }
+
+  if (search) {
+    list = list.filter(f => f.name.toLowerCase().includes(search) || f.category.toLowerCase().includes(search) || f.source.toLowerCase().includes(search));
+  }
+
+  const tbody = document.getElementById('taco-food-table-body');
+  if (!tbody) return;
+
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #94a3b8;"><i class="fa-solid fa-magnifying-glass"></i> Nenhum alimento encontrado para os filtros selecionados.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(item => `
+    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; cursor: pointer;" onclick="window.showNutritionLabelModal('${item.id}')" title="Clique para ver o Rótulo Nutricional Padrão ANVISA">
+      <td style="padding: 0.75rem;"><strong style="color: #f8fafc;">${item.name}</strong></td>
+      <td style="padding: 0.75rem; text-align: center;"><span class="badge-status info">${item.category}</span></td>
+      <td style="padding: 0.75rem; text-align: center; color: #cbd5e1;">${item.portion}</td>
+      <td style="padding: 0.75rem; text-align: center; color: #fbbf24; font-weight: 700;">${item.kcal} kcal</td>
+      <td style="padding: 0.75rem; text-align: center; color: #34d399; font-weight: 600;">${item.protein}g</td>
+      <td style="padding: 0.75rem; text-align: center; color: #22d3ee;">${item.carbs}g</td>
+      <td style="padding: 0.75rem; text-align: center; color: #c084fc;">${item.fats}g</td>
+      <td style="padding: 0.75rem; text-align: center;"><span class="badge-neon-purple" style="font-size:0.7rem; padding: 2px 8px;">${item.source}</span></td>
+    </tr>
+  `).join('');
+};
+
+window.applyQuickFoodFilter = function(filterType) {
+  const input = document.getElementById('taco-search-input');
+  const catSelect = document.getElementById('taco-category-filter');
+  const srcSelect = document.getElementById('taco-source-filter');
+
+  if (filterType === 'high-protein') {
+    if (srcSelect) srcSelect.value = 'TODAS';
+    if (catSelect) catSelect.value = 'Proteínas';
+    if (input) input.value = '';
+  } else if (filterType === 'low-carb') {
+    if (srcSelect) srcSelect.value = 'rotulos';
+    if (catSelect) catSelect.value = 'TODAS';
+    if (input) input.value = '';
+  } else if (filterType === 'high-fiber') {
+    if (srcSelect) srcSelect.value = 'taco';
+    if (catSelect) catSelect.value = 'Carboidratos';
+    if (input) input.value = 'aveia';
+  } else {
+    if (srcSelect) srcSelect.value = 'TODAS';
+    if (catSelect) catSelect.value = 'TODAS';
+    if (input) input.value = '';
+  }
+
+  window.filterTacoFoodDatabaseUI();
+};
+
+window.showNutritionLabelModal = function(foodId) {
+  const food = (window.expandedTacoDatabase || []).find(f => f.id === foodId);
+  if (!food) return;
+
+  const modalHtml = `
+    <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 10000;" onclick="this.remove()">
+      <div class="nutrition-label-card" onclick="event.stopPropagation()">
+        <div class="nutrition-label-header">
+          <h2 class="nutrition-label-title">INFORMAÇÃO NUTRICIONAL</h2>
+          <small><strong>${food.name}</strong> (${food.source})</small>
+        </div>
+        <p style="margin: 4px 0 8px 0; font-size: 0.85rem;"><strong>Porção de ${food.portion}</strong></p>
+        <table class="nutrition-label-table">
+          <thead>
+            <tr style="border-bottom: 3px solid #000;">
+              <th>Quantidade por porção</th>
+              <th style="text-align: right;">%VD (*)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="thick-row">
+              <td><strong>Valor Energético</strong></td>
+              <td style="text-align: right;"><strong>${food.kcal} kcal = ${Math.round(food.kcal * 4.184)} kJ</strong> (${Math.round((food.kcal/2000)*100)}%)</td>
+            </tr>
+            <tr>
+              <td>Carboidratos Totais</td>
+              <td style="text-align: right;">${food.carbs}g (${Math.round((food.carbs/300)*100)}%)</td>
+            </tr>
+            <tr>
+              <td><strong>Proteínas</strong></td>
+              <td style="text-align: right;"><strong>${food.protein}g</strong> (${Math.round((food.protein/75)*100)}%)</td>
+            </tr>
+            <tr>
+              <td>Gorduras Totais</td>
+              <td style="text-align: right;">${food.fats}g (${Math.round((food.fats/55)*100)}%)</td>
+            </tr>
+            <tr>
+              <td>Fibras Alimentares</td>
+              <td style="text-align: right;">${food.fiber || 0}g (${Math.round(((food.fiber||0)/25)*100)}%)</td>
+            </tr>
+            <tr style="border-bottom: 4px solid #000;">
+              <td>Sódio</td>
+              <td style="text-align: right;">${food.sodium || 0}mg (${Math.round(((food.sodium||0)/2400)*100)}%)</td>
+            </tr>
+          </tbody>
+        </table>
+        <small style="display: block; margin-top: 8px; font-size: 0.65rem; color: #555;">* % Valores Diários com base em uma dieta de 2.000 kcal ou 8.400 kJ. Fonte oficial: ${food.source}.</small>
+        <button type="button" onclick="this.closest('div[style*=\'position: fixed\']').remove()" style="width: 100%; margin-top: 12px; padding: 6px; background: #000; color: #fff; border: none; font-weight: 700; cursor: pointer; border-radius: 4px;">FECHAR TABELA</button>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
 };

@@ -2021,40 +2021,62 @@
           </div>
         </section>
 
-        <!-- TAB 7: NATIVE FOOD DATABASE (TACO UNICAMP / TBCA USP / USDA) -->
+        <!-- TAB 7: NATIVE FOOD DATABASE (TACO UNICAMP / TBCA USP / USDA / RÓTULOS COMERCIAIS) -->
         <section id="tab-tabela-nutricional" class="tab-panel">
-          <div class="card glass-card">
-            <div class="card-header flex-between">
+          <div class="card glass-card glow-cyan">
+            <div class="card-header flex-between align-center flex-wrap gap-sm">
               <div>
-                <h3 class="card-title text-cyan"><i class="fa-solid fa-book-open-reader"></i> Base de Alimentos Nativa (TACO / TBCA / USDA)</h3>
-                <p class="card-subtitle">Consulta instantânea de nutrientes, gramagens, medidas caseiras e alimentos brasileiros</p>
+                <h3 class="card-title text-cyan"><i class="fa-solid fa-database text-cyan"></i> Base de Alimentos Expandida (TACO / TBCA / USDA / Rótulos Fit)</h3>
+                <p class="card-subtitle">Consulta instantânea de alimentos in natura, suplementos e produtos comerciais industrializados</p>
               </div>
               <div class="flex-center gap-sm">
                 <button class="btn-secondary" onclick="triggerBarcodeScannerSim()"><i class="fa-solid fa-barcode"></i> Leitor Código de Barras</button>
-                <button class="btn-primary" onclick="showAddCustomFoodModal()"><i class="fa-solid fa-plus"></i> Novo Alimento</button>
+                <button class="btn-primary" onclick="showAddCustomFoodModal()"><i class="fa-solid fa-plus"></i> Cadastrar Alimento Customizado</button>
               </div>
             </div>
 
-            <!-- CONTROLES DE BUSCA E FILTROS DE CATEGORIA -->
+            <!-- CONTROLES DE BUSCA E FILTROS EXPANDIDOS -->
             <div class="nutri-form-grid margin-top">
-              <div class="form-group col-span-8">
-                <label><i class="fa-solid fa-magnifying-glass"></i> Buscar por nome de alimento ou ingrediente</label>
-                <input type="text" id="taco-search-input" placeholder="Ex: Peito de frango, Aveia, Iogurte, Arroz, Ovos, Banana..." onkeyup="filterTacoFoodDatabaseUI()">
+              <div class="form-group col-span-6">
+                <label><i class="fa-solid fa-magnifying-glass text-cyan"></i> Buscar por Alimento, Marca ou Rótulo Comercial</label>
+                <input type="text" id="taco-search-input" class="form-input-cyber" placeholder="Ex: Whey Protein, Peito de Frango, Iogurte YoPRO, Pasta de Amendoim, Ovos, Aveia..." onkeyup="filterTacoFoodDatabaseUI()">
               </div>
-              <div class="form-group col-span-4">
-                <label><i class="fa-solid fa-filter"></i> Categoria / Grupo Alimentar</label>
-                <select id="taco-category-filter" onchange="filterTacoFoodDatabaseUI()">
+              
+              <div class="form-group col-span-3">
+                <label><i class="fa-solid fa-database text-purple"></i> Tabela / Fonte de Dados</label>
+                <select id="taco-source-filter" class="form-input-cyber" onchange="filterTacoFoodDatabaseUI()">
+                  <option value="TODAS">Todas as Fontes (TACO + TBCA + USDA + Rótulos)</option>
+                  <option value="taco">TACO Unicamp (In Natura)</option>
+                  <option value="tbca">TBCA USP (Alimentos BR)</option>
+                  <option value="usda">USDA (Internacional)</option>
+                  <option value="rotulos">Rótulos Comerciais & Fit</option>
+                  <option value="suplementos">Suplementação & Proteicos</option>
+                </select>
+              </div>
+
+              <div class="form-group col-span-3">
+                <label><i class="fa-solid fa-filter text-emerald"></i> Categoria Nutricional</label>
+                <select id="taco-category-filter" class="form-input-cyber" onchange="filterTacoFoodDatabaseUI()">
                   <option value="TODAS">Todas as Categorias</option>
-                  <option value="Proteínas">Proteínas</option>
-                  <option value="Carboidratos">Carboidratos</option>
-                  <option value="Leguminosas">Leguminosas</option>
+                  <option value="Proteínas">Proteínas & Carnes</option>
+                  <option value="Carboidratos">Carboidratos & Cerais</option>
+                  <option value="Leguminosas">Leguminosas & Grãos</option>
                   <option value="Laticínios">Laticínios & Ovos</option>
                   <option value="Gorduras">Gorduras & Oleaginosas</option>
                   <option value="Frutas">Frutas</option>
                   <option value="Vegetais">Vegetais & Verduras</option>
-                  <option value="Suplementos">Suplementos</option>
+                  <option value="Suplementos">Suplementos & Proteicos</option>
                 </select>
               </div>
+            </div>
+
+            <!-- QUICK FILTER PILLS -->
+            <div class="flex-center gap-xs margin-top-sm flex-wrap" style="justify-content: flex-start;">
+              <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600; margin-right: 4px;"><i class="fa-solid fa-bolt text-amber"></i> Filtros Rápidos:</span>
+              <button type="button" class="badge-neon-emerald" onclick="window.applyQuickFoodFilter('high-protein')" style="cursor: pointer; padding: 4px 10px;">⚡ High Protein (&gt;15g Prot)</button>
+              <button type="button" class="badge-neon-cyan" onclick="window.applyQuickFoodFilter('low-carb')" style="cursor: pointer; padding: 4px 10px;">🥑 Low Carb (&lt;5g Carb)</button>
+              <button type="button" class="badge-neon-purple" onclick="window.applyQuickFoodFilter('high-fiber')" style="cursor: pointer; padding: 4px 10px;">🌾 Rico em Fibras (&gt;3g Fibra)</button>
+              <button type="button" class="badge-status accent" onclick="window.applyQuickFoodFilter('all')" style="cursor: pointer; padding: 4px 10px;">🔄 Mostrar Todos</button>
             </div>
 
             <!-- TABELA DE ALIMENTOS RESULTADO DA BUSCA -->
