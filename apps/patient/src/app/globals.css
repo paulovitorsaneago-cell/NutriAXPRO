@@ -1,0 +1,226 @@
+/* ============================================================================
+   NutriAX Pro — Patient App Design System
+   Mobile-first PWA with dark theme, matching the web design tokens
+   ============================================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --color-primary: #10b981;
+  --color-primary-light: #34d399;
+  --color-primary-dark: #059669;
+  --color-primary-50: rgba(16, 185, 129, 0.08);
+  --color-accent: #8b5cf6;
+  --color-accent-light: #a78bfa;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
+  --bg-root: #0a0e17;
+  --bg-surface: #111827;
+  --bg-surface-raised: #1a2234;
+  --bg-surface-hover: #243044;
+  --border-subtle: rgba(148, 163, 184, 0.08);
+  --border-default: rgba(148, 163, 184, 0.12);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --text-muted: #475569;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-full: 9999px;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --bottom-nav-height: 64px;
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: var(--bg-root);
+  min-height: 100vh;
+  padding-bottom: var(--bottom-nav-height);
+  font-size: 0.9375rem;
+}
+a { color: var(--color-primary-light); text-decoration: none; }
+
+/* ── Page Header ── */
+.app-header {
+  position: sticky; top: 0; z-index: 40;
+  padding: var(--space-5) var(--space-5) var(--space-3);
+  background: rgba(10, 14, 23, 0.85);
+  backdrop-filter: blur(12px);
+}
+.app-header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.app-header .subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ── Page Content ── */
+.app-content { padding: var(--space-4) var(--space-5); }
+
+/* ── Bottom Navigation ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: var(--bottom-nav-height);
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  display: flex; z-index: 50;
+}
+.bottom-nav a {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+  text-decoration: none;
+}
+.bottom-nav a .nav-icon-emoji { font-size: 1.25rem; }
+.bottom-nav a.active { color: var(--color-primary); }
+.bottom-nav a:hover { color: var(--text-secondary); }
+
+/* ── Cards ── */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+}
+
+/* ── Meal Cards ── */
+.meal-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+.meal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-surface-raised);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.meal-time {
+  font-size: 0.6875rem;
+  color: var(--color-primary-light);
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+.meal-name { font-size: 0.9375rem; font-weight: 700; }
+.meal-items { padding: var(--space-3) var(--space-4); }
+.meal-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.meal-item:last-child { border-bottom: none; }
+.meal-item-name { font-size: 0.875rem; }
+.meal-item-portion { font-size: 0.75rem; color: var(--text-tertiary); }
+.meal-macros {
+  display: flex; gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-surface-raised);
+  font-size: 0.6875rem; font-weight: 600; font-family: var(--font-mono);
+}
+.macro-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+.macro-dot.protein { background: #3b82f6; }
+.macro-dot.carb { background: #f59e0b; }
+.macro-dot.fat { background: #ef4444; }
+.macro-dot.kcal { background: var(--color-primary); }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  font-size: 0.875rem; font-weight: 600;
+  border-radius: var(--radius-lg); border: none; cursor: pointer;
+  transition: all var(--transition-base);
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: white;
+}
+.btn-primary:active { transform: scale(0.97); }
+.btn-check {
+  width: 100%; padding: var(--space-4);
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  color: var(--text-primary);
+  font-size: 0.9375rem; font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+.btn-check:hover { background: var(--bg-surface-hover); }
+.btn-check.checked {
+  background: var(--color-primary-50);
+  border-color: var(--color-primary);
+  color: var(--color-primary-light);
+}
+
+/* ── Progress Ring ── */
+.progress-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+.progress-ring svg { transform: rotate(-90deg); }
+.progress-ring .value {
+  position: absolute; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em;
+}
+.progress-ring .label {
+  position: absolute; bottom: -4px; font-size: 0.625rem; color: var(--text-tertiary);
+}
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; font-size: 0.6875rem; font-weight: 600;
+  border-radius: var(--radius-full);
+}
+.badge-success { background: rgba(16,185,129,0.15); color: var(--color-success); }
+.badge-warning { background: rgba(245,158,11,0.15); color: var(--color-warning); }
+.badge-danger { background: rgba(239,68,68,0.15); color: var(--color-danger); }
+
+/* ── Animations ── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in 0.3s ease-out; }
+.stagger > * { animation: fade-in 0.4s ease-out both; }
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.10s; }
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger > *:nth-child(4) { animation-delay: 0.20s; }
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger > *:nth-child(6) { animation-delay: 0.30s; }
+.stagger > *:nth-child(7) { animation-delay: 0.35s; }
+
+/* ── Form ── */
+.form-input {
+  width: 100%; padding: var(--space-3) var(--space-4);
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+}
+.form-input:focus { outline: none; border-color: var(--color-primary); }

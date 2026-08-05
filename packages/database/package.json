@@ -1,0 +1,10 @@
+{
+  "name": "@nutriaxpro/database",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./types/database.types.ts",
+  "types": "./types/database.types.ts",
+  "exports": {
+    "./types": "./types/database.types.ts"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@nutriaxpro/ai",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "zod": "^3.24.0"
+  }
+}
