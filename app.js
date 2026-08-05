@@ -573,6 +573,11 @@ function initCurrentDate() {
 // ==========================================================================
 // RENDERIZAÇÃO DO PLANO ALIMENTAR (LAYOUT HORIZONTAL & GESTÃO DINÂMICA)
 // ==========================================================================
+
+
+// ==========================================================================
+// RENDERIZAÇÃO DO PLANO ALIMENTAR (LAYOUT VERTICAL LARGURA DA PÁGINA)
+// ==========================================================================
 function renderDietMeals() {
   const container = document.getElementById('meals-list');
   if (!container) return;
@@ -625,86 +630,98 @@ function renderDietMeals() {
     const mealId = meal.id || ('meal_' + index);
 
     return `
-      <div class="meal-horizontal-card glow-purple" id="${mealId}">
-        <div>
-          <!-- HEADER DA REFEIÇÃO -->
-          <div class="meal-card-header-bar">
-            <div>
-              <h4 style="color: #f8fafc; font-size: 1rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 6px;">
-                <i class="fa-solid fa-utensils text-purple"></i> ${mealTitle}
-              </h4>
-              <small style="color: #cbd5e1; font-size: 0.75rem;"><i class="fa-regular fa-clock"></i> ${mealTime} | Meta: ~${targetKcal} kcal</small>
+      <div class="meal-vertical-full-card glow-purple" id="${mealId}">
+        <!-- HEADER DA REFEIÇÃO -->
+        <div class="flex-between align-center flex-wrap gap-sm" style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem; margin-bottom: 0.75rem;">
+          <div>
+            <h3 style="color: #f8fafc; font-size: 1.15rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-utensils text-purple"></i> ${mealTitle}
+            </h3>
+            <span style="color: #cbd5e1; font-size: 0.8rem;"><i class="fa-regular fa-clock"></i> ${mealTime} | Meta da Refeição: ~${targetKcal} kcal</span>
+          </div>
+
+          <div class="flex-center gap-sm flex-wrap">
+            <div style="display: flex; gap: 6px; font-size: 0.78rem;">
+              <span class="macro-mini-pill p" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 700; padding: 4px 10px;">${actualProtein}g Prot</span>
+              <span class="macro-mini-pill c" style="background: rgba(6, 182, 212, 0.2); color: #22d3ee; font-weight: 700; padding: 4px 10px;">${actualCarbs}g Carb</span>
+              <span class="macro-mini-pill g" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-weight: 700; padding: 4px 10px;">${actualFats}g Gord</span>
             </div>
+
             ${activeRole === 'nutri' ? `
-              <button type="button" class="btn-text text-rose" onclick="window.deleteMealFromPrescription('${mealId}')" title="Excluir esta refeição" style="font-size: 0.85rem; padding: 2px 6px;">
-                <i class="fa-solid fa-trash-can"></i>
+              <button type="button" class="btn-secondary btn-sm" onclick="window.addFoodToMeal('${mealId}')" title="Adicionar alimento nesta refeição">
+                <i class="fa-solid fa-plus"></i> Alimento
+              </button>
+            ` : ''}
+
+            <button type="button" class="btn-success btn-sm" onclick="logAndConfirmPrescribedMeal('${mealId}')" title="Carregar refeição na planilha do diário">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Carregar Planilha
+            </button>
+
+            ${activeRole === 'nutri' ? `
+              <button type="button" class="btn-text text-rose" onclick="window.deleteMealFromPrescription('${mealId}')" title="Excluir esta refeição da prescrição">
+                <i class="fa-solid fa-trash-can"></i> Excluir
               </button>
             ` : ''}
           </div>
+        </div>
 
-          <!-- TERMÔMETRO NUTRICIONAL DA REFEIÇÃO -->
-          <div class="diet-thermometer-container margin-bottom-sm">
-            <div style="display: flex; flex-direction: column; flex: 1;">
-              <div style="display: flex; justify-content: space-between; font-size: 0.72rem; margin-bottom: 3px;">
-                <span style="color: #cbd5e1;">Aporte: <strong>${actualKcal} kcal</strong></span>
-                <span class="diet-thermometer-badge ${thermo.status}">${thermo.label} (${thermo.percentage}%)</span>
-              </div>
-              <div class="diet-thermometer-bar-wrapper">
-                <div class="diet-thermometer-fill" style="width: ${thermo.percentage}%; background: ${thermo.color};"></div>
-              </div>
+        <!-- TERMÔMETRO NUTRICIONAL EM LARGURA TOTAL -->
+        <div class="diet-thermometer-container margin-bottom" style="background: rgba(0, 0, 0, 0.25); padding: 0.65rem 1rem;">
+          <div style="display: flex; flex-direction: column; width: 100%;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+              <span style="color: #cbd5e1;">Aporte Calórico da Refeição: <strong style="color: #fbbf24;">${actualKcal} kcal</strong> / ${targetKcal} kcal</span>
+              <span class="diet-thermometer-badge ${thermo.status}">${thermo.label} (${thermo.percentage}%)</span>
             </div>
-          </div>
-
-          <!-- MACRO SUMMARY PILLS -->
-          <div style="display: flex; gap: 4px; font-size: 0.7rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
-            <span class="macro-mini-pill p" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 700;">${actualProtein}g P</span>
-            <span class="macro-mini-pill c" style="background: rgba(6, 182, 212, 0.2); color: #22d3ee; font-weight: 700;">${actualCarbs}g C</span>
-            <span class="macro-mini-pill g" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-weight: 700;">${actualFats}g G</span>
-          </div>
-
-          <!-- FOODS LIST TABLE -->
-          <div style="max-height: 240px; overflow-y: auto; font-size: 0.78rem;">
-            ${foods.length === 0 ? `
-              <p style="color: #64748b; font-size: 0.75rem; font-style: italic; text-align: center; margin: 1rem 0;">Nenhum alimento cadastrado nesta refeição.</p>
-            ` : `
-              <table style="width: 100%; border-collapse: collapse;">
-                <tbody>
-                  ${foods.map((food, fIdx) => `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                      <td style="padding: 4px 0; color: #f8fafc; font-weight: 600;">${food.name}</td>
-                      <td style="padding: 4px 0; text-align: right; color: #94a3b8; white-space: nowrap;">${food.qty || (food.qtyGrams ? food.qtyGrams + 'g' : '')}</td>
-                      ${activeRole === 'nutri' ? `
-                        <td style="padding: 4px 0 4px 6px; text-align: right;">
-                          <button type="button" style="background:none; border:none; color:#f43f5e; cursor:pointer;" onclick="window.deleteFoodFromMeal('${mealId}', ${fIdx})">
-                            <i class="fa-solid fa-xmark"></i>
-                          </button>
-                        </td>
-                      ` : ''}
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            `}
+            <div class="diet-thermometer-bar-wrapper" style="height: 10px;">
+              <div class="diet-thermometer-fill" style="width: ${thermo.percentage}%; background: ${thermo.color};"></div>
+            </div>
           </div>
         </div>
 
-        <!-- FOOTER BUTTONS -->
-        <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.75rem; display: flex; gap: 6px;">
-          ${activeRole === 'nutri' ? `
-            <button type="button" class="btn-secondary btn-sm" onclick="window.addFoodToMeal('${mealId}')" style="flex: 1; font-size: 0.75rem;">
-              <i class="fa-solid fa-plus"></i> Alimento
-            </button>
-          ` : ''}
-          <button type="button" class="btn-success btn-sm" onclick="logAndConfirmPrescribedMeal('${mealId}')" style="flex: 1; font-size: 0.75rem;">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Carregar Planilha
-          </button>
+        <!-- TABELA DE ALIMENTOS DA REFEIÇÃO EM LARGURA TOTAL -->
+        <div style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+            <thead>
+              <tr style="background: rgba(30, 41, 59, 0.6); color: #cbd5e1; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <th style="padding: 0.6rem 0.8rem; text-align: left;">Alimento Prescrito</th>
+                <th style="padding: 0.6rem 0.8rem; text-align: center;">Quantidade / Porção</th>
+                <th style="padding: 0.6rem 0.8rem; text-align: center;">Calorias (Kcal)</th>
+                <th style="padding: 0.6rem 0.8rem; text-align: center;">Proteínas (g)</th>
+                <th style="padding: 0.6rem 0.8rem; text-align: center;">Carbos (g)</th>
+                <th style="padding: 0.6rem 0.8rem; text-align: center;">Gorduras (g)</th>
+                ${activeRole === 'nutri' ? '<th style="padding: 0.6rem 0.8rem; text-align: center;">Ação</th>' : ''}
+              </tr>
+            </thead>
+            <tbody>
+              ${foods.length === 0 ? `
+                <tr><td colspan="7" style="color: #64748b; font-size: 0.8rem; font-style: italic; text-align: center; padding: 1rem;">Nenhum alimento cadastrado nesta refeição.</td></tr>
+              ` : `
+                ${foods.map((food, fIdx) => `
+                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 0.6rem 0.8rem; color: #f8fafc; font-weight: 600;">${food.name}</td>
+                    <td style="padding: 0.6rem 0.8rem; text-align: center; color: #cbd5e1;">${food.qty || (food.qtyGrams ? food.qtyGrams + 'g' : '-')}</td>
+                    <td style="padding: 0.6rem 0.8rem; text-align: center; color: #fbbf24; font-weight: 700;">${food.kcal || 0} kcal</td>
+                    <td style="padding: 0.6rem 0.8rem; text-align: center; color: #34d399; font-weight: 600;">${food.protein || 0}g</td>
+                    <td style="padding: 0.6rem 0.8rem; text-align: center; color: #22d3ee;">${food.carbs || 0}g</td>
+                    <td style="padding: 0.6rem 0.8rem; text-align: center; color: #c084fc;">${food.fats || 0}g</td>
+                    ${activeRole === 'nutri' ? `
+                      <td style="padding: 0.6rem 0.8rem; text-align: center;">
+                        <button type="button" class="btn-remove-food" onclick="window.deleteFoodFromMeal('${mealId}', ${fIdx})" title="Remover este alimento">
+                          <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                      </td>
+                    ` : ''}
+                  </tr>
+                `).join('')}
+              `}
+            </tbody>
+          </table>
         </div>
       </div>
     `;
   }).join('');
 }
 
-// FOOD DELETION AND ADDITION FOR NUTRI
 window.deleteFoodFromMeal = function(mealId, foodIndex) {
   const activeRole = (typeof window.getUserRole === 'function') ? window.getUserRole() : 'patient';
   if (activeRole === 'patient') return;

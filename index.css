@@ -629,65 +629,30 @@ a {
 
 
 /* ========================================================================== */
-/* PLANO ALIMENTAR - LAYOUT HORIZONTAL E CARDS EM COLUNAS */
+/* PLANO ALIMENTAR - LAYOUT VERTICAL LARGURA TOTAL (STACKED FULL WIDTH) */
 /* ========================================================================== */
-.meals-horizontal-scroll-container {
+.meals-vertical-container {
   display: flex !important;
-  gap: 1.25rem !important;
-  overflow-x: auto !important;
-  padding: 0.5rem 0.25rem 1.25rem 0.25rem !important;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
+  flex-direction: column !important;
+  gap: 1.5rem !important;
+  width: 100% !important;
 }
 
-.meals-horizontal-scroll-container::-webkit-scrollbar {
-  height: 8px;
-}
-
-.meals-horizontal-scroll-container::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-.meals-horizontal-scroll-container::-webkit-scrollbar-thumb {
-  background: rgba(16, 185, 129, 0.4);
-  border-radius: 4px;
-}
-
-.meals-horizontal-scroll-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.7);
-}
-
-.meal-horizontal-card {
-  min-width: 350px !important;
-  max-width: 380px !important;
-  flex: 0 0 350px !important;
-  scroll-snap-align: start;
+.meal-vertical-full-card {
+  width: 100% !important;
   background: rgba(15, 23, 42, 0.75) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: var(--radius-xl, 16px) !important;
-  padding: 1.25rem !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: space-between !important;
+  padding: 1.5rem !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
   transition: all 0.3s ease !important;
 }
 
-.meal-horizontal-card:hover {
-  border-color: rgba(16, 185, 129, 0.4) !important;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.2) !important;
-  transform: translateY(-4px) !important;
+.meal-vertical-full-card:hover {
+  border-color: rgba(168, 85, 247, 0.4) !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(168, 85, 247, 0.2) !important;
 }
 
-.meal-card-header-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 0.75rem;
-  margin-bottom: 0.75rem;
-}
 
 
 /* CARDS & GLASSMORPHISM */
