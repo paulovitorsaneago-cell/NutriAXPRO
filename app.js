@@ -2577,6 +2577,49 @@ window.applyUserRoleEnvironment = function(role) {
 
   // 3. Enforce Preenchimento Restrictions across all modules
   window.enforcePreenchimentoPermissions(activeRole);
+
+  // Fasting Action Buttons Visibility based on Role (Patient Exclusive Actions)
+  const fastingBtn = document.getElementById('btn-fasting-action');
+  const fastingQuickBtn = document.querySelector('.btn-quick-fasting-window');
+  const fastingProtocolSelect = document.getElementById('fasting-protocol-select');
+  
+  if (role === 'nutri') {
+    if (fastingBtn) {
+      fastingBtn.style.display = 'none';
+    }
+    if (fastingQuickBtn) {
+      fastingQuickBtn.style.display = 'none';
+    }
+    if (fastingProtocolSelect) {
+      fastingProtocolSelect.disabled = false;
+    }
+    // Enable prescribed fasting fields for nutritionist
+    ['nutri-prescribed-fasting-protocol', 'nutri-prescribed-fasting-start', 'nutri-prescribed-fasting-end', 'nutri-prescribed-fasting-notes'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.removeAttribute('disabled');
+        el.classList.remove('patient-readonly-field');
+      }
+    });
+  } else {
+    if (fastingBtn) {
+      fastingBtn.style.display = 'inline-flex';
+    }
+    if (fastingQuickBtn) {
+      fastingQuickBtn.style.display = 'flex';
+    }
+    if (fastingProtocolSelect) {
+      fastingProtocolSelect.disabled = true;
+    }
+    // Disable prescribed fasting fields for patient
+    ['nutri-prescribed-fasting-protocol', 'nutri-prescribed-fasting-start', 'nutri-prescribed-fasting-end', 'nutri-prescribed-fasting-notes'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.setAttribute('disabled', 'disabled');
+        el.classList.add('patient-readonly-field');
+      }
+    });
+  }
 };
 
 window.enforcePreenchimentoPermissions = function(role) {
@@ -3268,4 +3311,70 @@ window.logFastingWindowSlot = function() {
   }
 
   alert('✅ Janela de Jejum registrada no diário alimentar de hoje! A taxa de adesão alimentar foi mantida sem penalidade.');
+};
+
+
+// ==========================================================================
+// FUNÇÕES DE PRESCRIÇÃO DE JEJUM INTERMITENTE PELO NUTRICIONISTA
+// ==========================================================================
+window.savePrescribedFastingProtocol = function(protocol) {
+  if (!AppData.patient) AppData.patient = {};
+  AppData.patient.prescribedFastingProtocol = protocol;
+
+  const badge = document.getElementById('prescribed-fasting-badge');
+  if (badge) {
+    badge.innerHTML = `<i class="fa-solid fa-clock"></i> Protocolo Prescrito: ${protocol === 'none' ? 'Nenhum' : protocol + ' Horas'}`;
+  }
+
+  // Update FastingEngine default protocol
+  if (window.FastingEngine && protocol !== 'none') {
+    window.FastingEngine.onProtocolChange(protocol);
+  }
+
+  DatabaseEngine.save();
+};
+
+window.savePrescribedFastingTimes = function() {
+  if (!AppData.patient) AppData.patient = {};
+  const startEl = document.getElementById('nutri-prescribed-fasting-start');
+  const endEl = document.getElementById('nutri-prescribed-fasting-end');
+  
+  if (startEl) AppData.patient.prescribedFastingStart = startEl.value;
+  if (endEl) AppData.patient.prescribedFastingEnd = endEl.value;
+
+  DatabaseEngine.save();
+};
+
+window.savePrescribedFastingNotes = function(notes) {
+  if (!AppData.patient) AppData.patient = {};
+  AppData.patient.prescribedFastingNotes = notes;
+  DatabaseEngine.save();
+};
+
+window.loadPrescribedFastingUI = function() {
+  if (!AppData.patient) return;
+
+  const protocolSelect = document.getElementById('nutri-prescribed-fasting-protocol');
+  const startInput = document.getElementById('nutri-prescribed-fasting-start');
+  const endInput = document.getElementById('nutri-prescribed-fasting-end');
+  const notesInput = document.getElementById('nutri-prescribed-fasting-notes');
+  const badge = document.getElementById('prescribed-fasting-badge');
+
+  if (protocolSelect && AppData.patient.prescribedFastingProtocol) {
+    protocolSelect.value = AppData.patient.prescribedFastingProtocol;
+  }
+  if (startInput && AppData.patient.prescribedFastingStart) {
+    startInput.value = AppData.patient.prescribedFastingStart;
+  }
+  if (endInput && AppData.patient.prescribedFastingEnd) {
+    endInput.value = AppData.patient.prescribedFastingEnd;
+  }
+  if (notesInput && AppData.patient.prescribedFastingNotes) {
+    notesInput.value = AppData.patient.prescribedFastingNotes;
+  }
+
+  const p = AppData.patient.prescribedFastingProtocol || '16:8';
+  if (badge) {
+    badge.innerHTML = `<i class="fa-solid fa-clock"></i> Protocolo Prescrito: ${p === 'none' ? 'Nenhum' : p + ' Horas'}`;
+  }
 };
