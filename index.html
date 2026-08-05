@@ -1,0 +1,2635 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="NutriAx Pro - Portal e Acompanhamento de Nutrição e Performance do Paciente">
+  <title>NutriAx Pro | Portal do Paciente</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- NUTRIAX PRO AUTHENTICATION PORTAL (LOGIN SCREEN) -->
+  <div id="auth-screen" class="auth-overlay">
+    <div class="auth-container">
+      <div class="auth-card glass-card">
+        <!-- Logo Section -->
+        <div class="auth-header">
+          <div class="brand-ring-outer">
+            <div class="brand-ring-inner">
+              <span class="logo-nutri">Nutri</span><span class="logo-a">A</span><span class="logo-x">x</span>
+            </div>
+          </div>
+          <span class="brand-badge-pro">PRO</span>
+          <h2 class="auth-title">Portal de Acesso NutriAx</h2>
+          <p class="auth-subtitle">Entre com suas credenciais para acessar seu plano e evolução</p>
+        </div>
+
+        <!-- Role Toggle Tabs -->
+        <div class="auth-role-tabs">
+          <button type="button" class="role-tab active" id="tab-role-patient" onclick="setAuthRole('patient')">
+            <i class="fa-solid fa-user"></i> Paciente
+          </button>
+          <button type="button" class="role-tab" id="tab-role-nutri" onclick="setAuthRole('nutri')">
+            <i class="fa-solid fa-user-doctor"></i> Nutricionista
+          </button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="auth-form" onsubmit="handleLoginSubmit(event)">
+          <div class="form-group">
+            <label for="login-email"><i class="fa-solid fa-envelope"></i> E-mail ou Usuário</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-user-large input-icon"></i>
+              <input type="email" id="login-email" required placeholder="seu.email@nutriax.com.br" value="paulovitor.rsousa3@gmail.com">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="login-password"><i class="fa-solid fa-lock"></i> Senha de Acesso</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-key input-icon"></i>
+              <input type="password" id="login-password" required placeholder="••••••••" value="123456">
+              <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('login-password', this)">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="auth-options">
+            <label class="remember-me">
+              <input type="checkbox" id="remember-me-check" checked>
+              <span>Lembrar meu acesso</span>
+            </label>
+            <a href="#" onclick="alert('Entre em contato com o nutricionista responsável (Paulo Vitor Ribeiro de Sousa) para redefinir sua senha.'); return false;" class="forgot-link">Esqueceu a senha?</a>
+          </div>
+
+          <div id="auth-error-msg" class="auth-error-banner" style="display: none;">
+            <i class="fa-solid fa-triangle-exclamation"></i> <span id="auth-error-text">E-mail ou senha incorretos.</span>
+          </div>
+
+          <button type="submit" class="btn-primary btn-auth-submit" id="btn-auth-submit">
+            <i class="fa-solid fa-right-to-bracket"></i> <span>Entrar no Portal</span>
+          </button>
+        </form>
+
+        <!-- Quick Demo Credentials Hint -->
+        <div class="auth-demo-hint">
+          <i class="fa-solid fa-shield-halved text-red"></i>
+          <div>
+            <strong>Acesso de Demonstração:</strong>
+            <small>E-mail: <code>paulovitor.rsousa3@gmail.com</code> | Senha: <code>123456</code></small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-logo-container">
+            <div class="brand-ring-outer">
+              <div class="brand-ring-inner">
+                <span class="logo-nutri">Nutri</span><span class="logo-a">A</span><span class="logo-x">x</span>
+              </div>
+            </div>
+            <span class="brand-badge-pro">PRO</span>
+          </div>
+          <p class="brand-tagline">DISCIPLINA QUE GERA RESULTADOS</p>
+        </div>
+      </div>
+
+      <!-- User Info Card in Sidebar -->
+      <div class="patient-card-mini">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Avatar" class="avatar" id="user-avatar">
+        <div class="patient-info-mini">
+          <h4 id="user-name">Paulo Vitor R.</h4>
+          <span class="badge-objective" id="user-objective"><i class="fa-solid fa-bullseye"></i> Emagrecimento</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="active" data-tab="dashboard">
+            <a href="#dashboard"><i class="fa-solid fa-chart-pie"></i> <span>Visão Geral</span></a>
+          </li>
+          <li data-tab="anamnese">
+            <a href="#anamnese"><i class="fa-solid fa-clipboard-question"></i> <span>Anamnese & MSQ 360°</span></a>
+          </li>
+          <li data-tab="dieta">
+            <a href="#dieta"><i class="fa-solid fa-utensils"></i> <span>Plano Alimentar</span></a>
+          </li>
+          <li data-tab="evolucao">
+            <a href="#evolucao"><i class="fa-solid fa-arrow-trend-up"></i> <span>Evolução Corporal</span></a>
+          </li>
+          <li data-tab="diario">
+            <a href="#diario"><i class="fa-solid fa-calendar-check"></i> <span>Diário & Check-in</span></a>
+          </li>
+          <li data-tab="atividades">
+            <a href="#atividades"><i class="fa-solid fa-person-running"></i> <span>Atividades & METs</span></a>
+          </li>
+          <li data-tab="tabela-nutricional">
+            <a href="#tabela-nutricional"><i class="fa-solid fa-book-open-reader"></i> <span>Tabelas (TACO/TBCA)</span></a>
+          </li>
+          <li data-tab="suplementacao">
+            <a href="#suplementacao"><i class="fa-solid fa-pills"></i> <span>Suplementação</span></a>
+          </li>
+          <li data-tab="exames">
+            <a href="#exames"><i class="fa-solid fa-vial-circle-check"></i> <span>Exames Clínicos</span></a>
+          </li>
+          <li class="nav-divider" style="margin: 0.5rem 0; border-top: 1px dashed rgba(220, 38, 38, 0.3);"></li>
+          <li data-tab="motor-ia" class="nav-item-nutri">
+            <a href="#motor-ia" style="color: #60a5fa; font-weight: 700;">
+              <i class="fa-solid fa-wand-magic-sparkles text-blue-400"></i> <span>Motor Prescrição IA</span>
+              <span class="badge-pro-mini" style="background: #2563eb;">AI</span>
+            </a>
+          </li>
+          <li data-tab="nutri-portal" class="nav-item-nutri">
+            <a href="#nutri-portal" style="color: #fca5a5; font-weight: 700;">
+              <i class="fa-solid fa-user-doctor text-red"></i> <span>Área Nutricionista</span>
+              <span class="badge-pro-mini">ADMIN</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="theme-toggle-btn" class="theme-toggle">
+          <i class="fa-solid fa-moon"></i> <span>Modo Escuro</span>
+        </button>
+        <div class="nutri-contact">
+          <i class="fa-solid fa-user-doctor"></i>
+          <div>
+            <small>Nutricionista Responsável</small>
+            <strong>Paulo Vitor Ribeiro de Sousa</strong>
+          </div>
+        </div>
+        <button type="button" class="btn-logout-sidebar" onclick="handleLogout()">
+          <i class="fa-solid fa-right-from-bracket"></i> <span>Sair / Encerrar Sessão</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+      
+      <!-- TOP NAVBAR -->
+      <header class="topbar">
+        <button class="mobile-menu-toggle" id="mobile-menu-btn">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="page-title">
+          <h1 id="current-page-title">Visão Geral</h1>
+          <p id="current-page-subtitle">Acompanhe seu progresso e metas em tempo real (NutriAx Pro)</p>
+        </div>
+
+        <div class="topbar-actions">
+          <div id="topbar-env-badge" class="badge-env-wrapper"></div>
+
+          <div class="date-badge" id="topbar-date-wrapper" title="Clique para escolher qualquer data para edição e inclusão">
+            <i class="fa-regular fa-calendar text-emerald"></i>
+            <input type="date" id="topbar-date-picker" onchange="onDateSelectionChanged(this.value)" style="background: transparent; border: none; color: inherit; font-family: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; outline: none;">
+          </div>
+
+          <div class="streak-badge" title="Dias seguidos de check-in cumprido">
+            <i class="fa-solid fa-fire"></i>
+            <span><strong>14</strong> dias seguidos</span>
+          </div>
+
+          <button class="btn-primary" id="btn-quick-checkin" onclick="window.switchTab('diario', event)">
+            <i class="fa-solid fa-plus"></i> Novo Check-in
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB CONTENT PANELS -->
+      <div class="content-body">
+
+        <!-- TAB 1: DASHBOARD -->
+        <section id="tab-dashboard" class="tab-panel active">
+          
+          <!-- KPI SUMMARY CARDS -->
+          <div class="kpi-grid">
+            <div class="kpi-card accent-emerald">
+              <div class="kpi-icon">
+                <i class="fa-solid fa-weight-scale"></i>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-label">Peso Atual</span>
+                <div class="kpi-value-group">
+                  <h3 id="dash-peso-atual">115.8 <small>kg</small></h3>
+                  <span class="kpi-change negative"><i class="fa-solid fa-arrow-down"></i> 6.2 kg</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar" style="width: 78%;"></div>
+                </div>
+                <small class="kpi-subtext">Meta Inicial: 107.99 kg (1.93m)</small>
+              </div>
+            </div>
+
+            <div class="kpi-card accent-cyan">
+              <div class="kpi-icon">
+                <i class="fa-solid fa-percent"></i>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-label">% Gordura (Dobras)</span>
+                <div class="kpi-value-group">
+                  <h3 id="dash-gordura-atual">17.9 <small>%</small></h3>
+                  <span class="kpi-change negative"><i class="fa-solid fa-arrow-down"></i> 6.6%</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar cyan" style="width: 72%;"></div>
+                </div>
+                <small class="kpi-subtext">Meta: 14.0% (Jackson Pollock 7)</small>
+              </div>
+            </div>
+
+            <div class="kpi-card accent-amber">
+              <div class="kpi-icon">
+                <i class="fa-solid fa-bolt"></i>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-label">Meta Calórica</span>
+                <div class="kpi-value-group">
+                  <h3>2.840 <small>kcal/dia</small></h3>
+                  <span class="badge-status success">Déficit -624</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar amber" style="width: 82%;"></div>
+                </div>
+                <small class="kpi-subtext">GET Estimado: 3.464 kcal (TMB 2.423)</small>
+              </div>
+            </div>
+
+            <div class="kpi-card accent-purple">
+              <div class="kpi-icon">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <div class="kpi-details">
+                <span class="kpi-label">Adesão Esperada</span>
+                <div class="kpi-value-group">
+                  <h3>ALTA <small>(94%)</small></h3>
+                  <span class="kpi-change positive"><i class="fa-solid fa-fire"></i> 6x Treino</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar purple" style="width: 94%;"></div>
+                </div>
+                <small class="kpi-subtext">Cozinha diariamente / Rotina regrada</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- MACRO DISTRIBUTION & WEIGHT EVOLUTION ROW -->
+          <div class="dashboard-row">
+            
+            <!-- MACRO TARGETS CARD -->
+            <div class="card glass-card col-span-6">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-pie-chart"></i> Meta Diária de Macronutrientes</h3>
+                  <p class="card-subtitle">Calculado por Katch-McArdle por Massa Magra (95 kg)</p>
+                </div>
+                <span class="badge-pill">2.840 Kcal</span>
+              </div>
+              
+              <div class="macros-wrapper">
+                <div class="chart-container-donut">
+                  <canvas id="macroChart"></canvas>
+                  <div class="donut-center-text">
+                    <strong>2.840</strong>
+                    <small>Kcal / dia</small>
+                  </div>
+                </div>
+
+                <div class="macros-breakdown">
+                  <div class="macro-item protein">
+                    <div class="macro-header">
+                      <span class="dot"></span>
+                      <strong>Proteínas</strong>
+                      <span class="macro-qty">190g (760 kcal)</span>
+                    </div>
+                    <div class="macro-percent">27% do total | 2.0g/kg MM</div>
+                  </div>
+
+                  <div class="macro-item carbs">
+                    <div class="macro-header">
+                      <span class="dot"></span>
+                      <strong>Carboidratos</strong>
+                      <span class="macro-qty">349g (1396 kcal)</span>
+                    </div>
+                    <div class="macro-percent">49% do total | Energia de treino</div>
+                  </div>
+
+                  <div class="macro-item fats">
+                    <div class="macro-header">
+                      <span class="dot"></span>
+                      <strong>Lipídios (Gorduras)</strong>
+                      <span class="macro-qty">76g (684 kcal)</span>
+                    </div>
+                    <div class="macro-percent">24% do total | Saúde hormonal</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RECENT WEIGHT EVOLUTION -->
+            <div class="card glass-card col-span-6">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-chart-line"></i> Progresso Recente de Peso</h3>
+                  <p class="card-subtitle">Evolução trimestral (Dados da aba 07_Evolução Corporal)</p>
+                </div>
+                <button class="btn-text" onclick="switchTab('evolucao')">Ver Detalhes <i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+              <div class="chart-container-line">
+                <canvas id="dashWeightChart"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- CONSUMO CALÓRICO E MACRONUTRIENTES DO DIA (ACOMPANHAMENTO DO DIA) -->
+          <div class="card glass-card col-span-12 daily-tracking-card margin-top">
+            <div class="card-header flex-between align-center">
+              <div>
+                <h3 class="card-title text-red"><i class="fa-solid fa-fire text-red"></i> Consumo Calórico e Macronutrientes do Dia</h3>
+                <p class="card-subtitle">Monitore o total acumulado das refeições lançadas para a data <strong id="food-log-date-display-dash">30/07/2026</strong></p>
+              </div>
+              <div class="daily-tracking-header-badges" id="food-log-total-kcal-badge">
+                <span class="badge-pill-kcal"><i class="fa-solid fa-utensils"></i> 0 / 2.840 Kcal</span>
+              </div>
+            </div>
+
+            <div class="daily-macro-grid">
+              <div class="macro-stat-box">
+                <div class="macro-stat-header">
+                  <span class="macro-stat-title"><i class="fa-solid fa-bolt text-amber"></i> Calorias (Kcal)</span>
+                  <span class="macro-stat-value" id="prog-val-kcal">0 / 2840 kcal (0%)</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar amber" id="prog-bar-kcal" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div class="macro-stat-box">
+                <div class="macro-stat-header">
+                  <span class="macro-stat-title"><i class="fa-solid fa-drumstick-bite text-red"></i> Proteínas (g)</span>
+                  <span class="macro-stat-value" id="prog-val-protein">0.0 / 190g (0%)</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar red" id="prog-bar-protein" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div class="macro-stat-box">
+                <div class="macro-stat-header">
+                  <span class="macro-stat-title"><i class="fa-solid fa-wheat-awn text-orange"></i> Carboidratos (g)</span>
+                  <span class="macro-stat-value" id="prog-val-carbs">0.0 / 349g (0%)</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar orange" id="prog-bar-carbs" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <div class="macro-stat-box">
+                <div class="macro-stat-header">
+                  <span class="macro-stat-title"><i class="fa-solid fa-droplet text-purple"></i> Gorduras (g)</span>
+                  <span class="macro-stat-value" id="prog-val-fats">0.0 / 76g (0%)</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar purple" id="prog-bar-fats" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- TAB 2: PLANO ALIMENTAR (DIETA) -->
+        <section id="tab-dieta" class="tab-panel">
+          
+          <div class="section-intro-card card glass-card">
+            <div class="intro-content">
+              <h2><i class="fa-solid fa-utensils"></i> Prescrição Nutricional Personalizada</h2>
+              <p>Plano desenvolvido por Paulo Vitor Ribeiro de Sousa focado em recomposição e redução de cintura para Paulo Vitor.</p>
+            </div>
+            <div class="diet-summary-pills">
+              <div class="pill-stat">
+                <small>Calorias Diárias</small>
+                <strong>2.840 kcal</strong>
+              </div>
+              <div class="pill-stat">
+                <small>Proteínas</small>
+                <strong>190g (2.0g/kg MM)</strong>
+              </div>
+              <div class="pill-stat">
+                <small>Carboidratos</small>
+                <strong>349g</strong>
+              </div>
+              <div class="pill-stat">
+                <small>Gorduras</small>
+                <strong>76g</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- MEAL TABS / CARDS -->
+          <div class="meals-container" id="meals-list">
+            <!-- Rendered dynamically by JavaScript -->
+          </div>
+
+        </section>
+
+        <!-- TAB 3: EVOLUÇÃO CORPORAL -->
+        <section id="tab-evolucao" class="tab-panel">
+          
+          <div class="dashboard-row">
+            <!-- WEIGHT & FAT CHART -->
+            <div class="card glass-card col-span-7">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-chart-line"></i> Histórico de Peso e % Gordura</h3>
+                  <p class="card-subtitle">Dobras Cutâneas (Jackson Pollock 7)</p>
+                </div>
+              </div>
+              <div class="chart-container-large">
+                <canvas id="fullEvolutionChart"></canvas>
+              </div>
+            </div>
+
+            <!-- BODY COMPOSITION DONUT / METRICS -->
+            <div class="card glass-card col-span-5">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-child"></i> Composição Corporal Atual</h3>
+                  <p class="card-subtitle">Medição em 09/07/2026</p>
+                </div>
+              </div>
+
+              <div class="body-comp-details">
+                <div class="comp-box">
+                  <span class="comp-title">Massa Magra</span>
+                  <span class="comp-value text-emerald">95.03 kg</span>
+                  <small>82.1% do peso total</small>
+                </div>
+
+                <div class="comp-box">
+                  <span class="comp-title">Massa Gorda</span>
+                  <span class="comp-value text-cyan">20.77 kg</span>
+                  <small>17.94% (% gordura)</small>
+                </div>
+
+                <div class="comp-box">
+                  <span class="comp-title">Taxa Metabólica Basal</span>
+                  <span class="comp-value text-amber">2.423 kcal</span>
+                  <small>Katch-McArdle por MM</small>
+                </div>
+
+                <div class="comp-box">
+                  <span class="comp-title">Gasto Energético (GET)</span>
+                  <span class="comp-value text-blue">3.464 kcal</span>
+                  <small>Fator atividade: 1.43</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CIRCUMFERENCES & SKINFOLDS TABLE -->
+          <div class="card glass-card margin-top">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title"><i class="fa-solid fa-ruler-combined"></i> Tabela Comparativa de Perímetros (cm)</h3>
+                <p class="card-subtitle">Evolução das medidas corporais extraídas do histórico</p>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Medida (cm)</th>
+                    <th>15/01/2026 (Inicial)</th>
+                    <th>15/03/2026</th>
+                    <th>15/05/2026</th>
+                    <th>09/07/2026 (Atual)</th>
+                    <th>Variação Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong><i class="fa-solid fa-circle text-emerald"></i> Peso Corporal (kg)</strong></td>
+                    <td>122.0 kg</td>
+                    <td>119.5 kg</td>
+                    <td>117.2 kg</td>
+                    <td><strong>115.8 kg</strong></td>
+                    <td><span class="badge-status success">- 6.2 kg</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>% Gordura (Dobras)</strong></td>
+                    <td>24.5 %</td>
+                    <td>22.0 %</td>
+                    <td>19.8 %</td>
+                    <td><strong>17.9 %</strong></td>
+                    <td><span class="badge-status success">- 6.6 %</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cintura (Umbilical)</strong></td>
+                    <td>112.0 cm</td>
+                    <td>108.0 cm</td>
+                    <td>104.5 cm</td>
+                    <td><strong>101.0 cm</strong></td>
+                    <td><span class="badge-status success">- 11.0 cm</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Abdômen (Maior)</strong></td>
+                    <td>116.0 cm</td>
+                    <td>111.0 cm</td>
+                    <td>106.0 cm</td>
+                    <td><strong>102.0 cm</strong></td>
+                    <td><span class="badge-status success">- 14.0 cm</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Quadril</strong></td>
+                    <td>118.0 cm</td>
+                    <td>115.0 cm</td>
+                    <td>113.0 cm</td>
+                    <td><strong>111.5 cm</strong></td>
+                    <td><span class="badge-status success">- 6.5 cm</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Massa Magra (kg)</strong></td>
+                    <td>92.1 kg</td>
+                    <td>93.2 kg</td>
+                    <td>94.0 kg</td>
+                    <td><strong>95.0 kg</strong></td>
+                    <td><span class="badge-status info">+ 2.9 kg</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- TAB 4: DIÁRIO E CHECK-IN -->
+        <section id="tab-diario" class="tab-panel">
+          
+          <!-- CALORIE & MACRO CONSUMPTION PROGRESS BANNER -->
+          <div class="card glass-card food-progress-card margin-bottom">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title"><i class="fa-solid fa-fire-flame-curved"></i> Consumo Calórico e Macronutrientes do Dia</h3>
+                <p class="card-subtitle">Monitore o total acumulado das refeições lançadas para a data <strong id="food-log-date-display">hoje</strong></p>
+              </div>
+              <span class="badge-status accent" id="food-log-total-kcal-badge"><i class="fa-solid fa-utensils"></i> 0 / 2.840 Kcal</span>
+            </div>
+
+            <div class="food-progress-grid">
+              <!-- Calorias Progress -->
+              <div class="food-progress-item">
+                <div class="progress-info-row">
+                  <span><strong><i class="fa-solid fa-bolt text-amber"></i> Calorias (Kcal)</strong></span>
+                  <span id="prog-val-kcal">0 / 2.840 kcal (0%)</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar amber" id="prog-bar-kcal" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <!-- Proteínas Progress -->
+              <div class="food-progress-item">
+                <div class="progress-info-row">
+                  <span><strong><i class="fa-solid fa-drumstick-bite text-emerald"></i> Proteínas (g)</strong></span>
+                  <span id="prog-val-protein">0 / 190g (0%)</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar" id="prog-bar-protein" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <!-- Carboidratos Progress -->
+              <div class="food-progress-item">
+                <div class="progress-info-row">
+                  <span><strong><i class="fa-solid fa-wheat-awn text-cyan"></i> Carboidratos (g)</strong></span>
+                  <span id="prog-val-carbs">0 / 349g (0%)</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar cyan" id="prog-bar-carbs" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <!-- Gorduras Progress -->
+              <div class="food-progress-item">
+                <div class="progress-info-row">
+                  <span><strong><i class="fa-solid fa-droplet text-amber"></i> Gorduras (g)</strong></span>
+                  <span id="prog-val-fats">0 / 76g (0%)</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar purple" id="prog-bar-fats" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MEAL & FOOD LOGGER SECTION -->
+          <div class="dashboard-row margin-bottom">
+            
+            <!-- LEFT PANEL: QUICK PRESETS & CUSTOM FOOD INPUT FORM -->
+            <div class="card glass-card col-span-5">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-plus-circle"></i> Inserir Refeição ou Alimento</h3>
+                  <p class="card-subtitle">Escolha uma refeição prescrita ou adicione alimentos avulsos</p>
+                </div>
+              </div>
+
+              <!-- PRESCRIBED MEAL QUICK LAUNCHER -->
+              <div class="prescribed-quick-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                  <label class="section-label" style="margin: 0;"><i class="fa-solid fa-bolt-lightning text-amber"></i> Lançar Refeição Prescrita</label>
+                  <button type="button" class="btn-success btn-sm" onclick="loadAllPrescribedPlanToSpreadsheet()" title="Carregar todas as refeições do Plano Alimentar e aplicar na planilha">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Carregar Plano Completo na Planilha
+                  </button>
+                </div>
+                <div class="quick-meals-grid" id="quick-meals-buttons">
+                  <!-- Filled dynamically by JavaScript -->
+                </div>
+              </div>
+
+              <div class="form-divider">
+                <span>ou adicione um alimento avulso</span>
+              </div>
+
+              <!-- CUSTOM FOOD FORM -->
+              <form id="form-add-custom-food" class="custom-food-form">
+                <div class="form-group">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <label for="food-meal-select">Refeição Destino</label>
+                    <span class="badge-status info" style="font-size: 0.68rem; padding: 2px 6px;"><i class="fa-solid fa-database"></i> Tabela 98 (Base de Dados)</span>
+                  </div>
+                  <select id="food-meal-select" required>
+                    <option value="ref-cafe">Café da Manhã</option>
+                    <option value="ref-lanche-m">Lanche da Manhã</option>
+                    <option value="ref-almoco">Almoço</option>
+                    <option value="ref-pre-treino">Pré-Treino</option>
+                    <option value="ref-pos-treino">Pós-Treino</option>
+                    <option value="ref-jantar">Jantar</option>
+                    <option value="ref-extra">Lanche Extra / Ceia</option>
+                  </select>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-7">
+                    <label for="food-select">Alimento (Tabela 98)</label>
+                    <select id="food-select" onchange="handleFoodSelectChange(this.value)" required>
+                      <!-- Filled dynamically by JavaScript -->
+                    </select>
+                    <input type="text" id="food-name-custom" placeholder="Digite o nome do alimento..." style="display: none; margin-top: 6px;">
+                  </div>
+                  <div class="form-group col-5">
+                    <label for="food-qty">Quantidade / Porção</label>
+                    <input type="text" id="food-qty" placeholder="ex: 150g ou 2 un" required>
+                  </div>
+                </div>
+
+                <small id="auto-calc-status" class="text-emerald" style="display: block; margin-bottom: 8px; font-size: 0.72rem; min-height: 18px; font-weight: 500;"></small>
+
+                <div class="form-row">
+                  <div class="form-group col-3">
+                    <label for="food-kcal">Kcal</label>
+                    <input type="number" step="1" id="food-kcal" placeholder="150" required>
+                  </div>
+                  <div class="form-group col-3">
+                    <label for="food-protein">Prot. (g)</label>
+                    <input type="number" step="0.1" id="food-protein" placeholder="12.0" required>
+                  </div>
+                  <div class="form-group col-3">
+                    <label for="food-carbs">Carb. (g)</label>
+                    <input type="number" step="0.1" id="food-carbs" placeholder="1.5" required>
+                  </div>
+                  <div class="form-group col-3">
+                    <label for="food-fats">Gord. (g)</label>
+                    <input type="number" step="0.1" id="food-fats" placeholder="10.0" required>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn-primary btn-block">
+                  <i class="fa-solid fa-circle-plus"></i> Inserir Alimento no Diário
+                </button>
+              </form>
+            </div>
+
+            <!-- RIGHT PANEL: DAILY LOGGED MEALS & FOODS LIST -->
+            <div class="card glass-card col-span-7">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-list-check"></i> Alimentos Consumidos no Dia</h3>
+                  <p class="card-subtitle">Lista de refeições e alimentos registrados para a data selecionada</p>
+                </div>
+                <div class="card-header-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                  <button class="btn-secondary btn-sm" id="btn-gs-connector" onclick="configureGoogleSheetsUrl()" title="Configurar Web App URL do Google Apps Script (aba 12_App do Paciente)">
+                    <i class="fa-solid fa-file-excel text-emerald"></i> GS Conectado
+                  </button>
+                  <button class="btn-success btn-sm" id="btn-confirm-daily-food" onclick="confirmDailyFoodLog()" title="Confirmar e aplicar consumo de alimentos do dia">
+                    <i class="fa-solid fa-circle-check"></i> Confirmar Todos
+                  </button>
+                  <button class="btn-text text-rose" onclick="clearDailyFoodLogs()" title="Limpar todos os registros do dia">
+                    <i class="fa-solid fa-trash-can"></i> Limpar Dia
+                  </button>
+                </div>
+              </div>
+
+              <div id="daily-food-log-container" class="daily-food-log-container">
+                <!-- Loaded dynamically by JavaScript -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- CHECKIN FORM & HISTORY ROW -->
+          <div class="dashboard-row">
+            
+            <!-- CHECKIN FORM -->
+            <div class="card glass-card col-span-5">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-pen-to-square"></i> Registrar Check-in Diário</h3>
+                  <p class="card-subtitle">Preencha ao final de cada dia</p>
+                </div>
+              </div>
+
+              <form id="form-checkin" class="checkin-form">
+                <div class="form-group">
+                  <label for="checkin-date">Data do Registro</label>
+                  <input type="date" id="checkin-date" onchange="onDateSelectionChanged(this.value)" required>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-6">
+                    <label for="checkin-peso">Peso do Dia (kg)</label>
+                    <input type="number" step="0.1" id="checkin-peso" placeholder="ex: 115.8">
+                  </div>
+                  <div class="form-group col-6">
+                    <label for="checkin-humor">Humor / Disposição</label>
+                    <select id="checkin-humor">
+                      <option value="Focado 🔥">Focado 🔥</option>
+                      <option value="Tranquilo 😁">Tranquilo 😁</option>
+                      <option value="Cansado 😴">Cansado 😴</option>
+                      <option value="Com Fome 😋">Com Fome 😋</option>
+                      <option value="Motivado 🚀">Motivado 🚀</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-6">
+                    <label for="checkin-treino">Treino de Força?</label>
+                    <select id="checkin-treino">
+                      <option value="Sim">Sim 💪 (ABC)</option>
+                      <option value="Não">Não (Descanso)</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-6">
+                    <label for="checkin-cardio">Cardio (minutos)</label>
+                    <input type="number" id="checkin-cardio" placeholder="ex: 15">
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-6">
+                    <label for="checkin-sono">Horas de Sono</label>
+                    <input type="number" step="0.5" id="checkin-sono" placeholder="ex: 7.5">
+                  </div>
+                  <div class="form-group col-6">
+                    <label for="checkin-qualidade-sono">Qualidade do Sono</label>
+                    <select id="checkin-qualidade-sono">
+                      <option value="Excelente">Excelente ⭐⭐⭐⭐⭐</option>
+                      <option value="Boa">Boa ⭐⭐⭐⭐</option>
+                      <option value="Regular">Regular ⭐⭐⭐</option>
+                      <option value="Ruim">Ruim ⭐⭐</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="checkin-obs">Observações / Fome / Digestão</label>
+                  <textarea id="checkin-obs" rows="2" placeholder="Digite comentários sobre energia ou rotina..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary btn-block">
+                  <i class="fa-solid fa-floppy-disk"></i> Salvar Check-in no Diário
+                </button>
+              </form>
+            </div>
+
+            <!-- HISTORICAL LOG TABLE / PLANILHA DE REGISTROS -->
+            <div class="card glass-card col-span-7">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-table"></i> Planilha de Registros e Consumo Diário</h3>
+                  <p class="card-subtitle">Sincronização em tempo real com alimentos da Tabela 98 e check-ins</p>
+                </div>
+                <button type="button" class="btn-secondary" onclick="exportHistoryCSV()" title="Baixar histórico em arquivo CSV/Excel">
+                  <i class="fa-solid fa-file-csv"></i> Exportar Planilha (CSV)
+                </button>
+              </div>
+
+              <div class="table-responsive">
+                <table class="custom-table" id="table-history">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Peso</th>
+                      <th>Refeições & Itens</th>
+                      <th>Kcal Total</th>
+                      <th>Proteínas</th>
+                      <th>Carbs</th>
+                      <th>Gorduras</th>
+                      <th>Treino / Sono</th>
+                      <th>Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="history-rows">
+                    <!-- Loaded dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- TAB 5: EXAMES CLÍNICOS -->
+        <section id="tab-exames" class="tab-panel">
+          
+          <div class="card glass-card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title"><i class="fa-solid fa-vial-circle-check"></i> Exames Clínicos e Bioquímicos</h3>
+                <p class="card-subtitle">Extraídos do laudo do paciente no NutriAx Pro</p>
+              </div>
+              <span class="badge-status accent"><i class="fa-solid fa-shield-halved"></i> Triagem Clínica Ativa</span>
+            </div>
+
+            <div class="exams-grid">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </div>
+
+        </section>
+
+        <!-- TAB 6: PORTAL DO NUTRICIONISTA (PAINEL DE PREENCHIMENTO E PRESCRIÇÃO) -->
+        <section id="tab-nutri-portal" class="tab-panel">
+          
+          <!-- NUTRI PORTAL INTRO CARD -->
+          <div class="section-intro-card card glass-card nutri-portal-header-card">
+            <div class="intro-content">
+              <h2><i class="fa-solid fa-user-doctor text-red"></i> Painel do Nutricionista — Prescrição & Gestão</h2>
+              <p>Preencha os dados do paciente, prescreva o plano alimentar e lance avaliações para alimentar o Portal do Paciente e a planilha em tempo real.</p>
+            </div>
+            <div class="nutri-status-badge">
+              <span class="badge-status success"><i class="fa-solid fa-user-check"></i> Paciente Ativo: <strong>Paulo Vitor R. de Sousa</strong></span>
+            </div>
+          </div>
+
+          <!-- NUTRI SUB-NAV TABS -->
+          <div class="nutri-subnav-tabs margin-top">
+            <button type="button" class="nutri-tab-btn active" onclick="switchNutriTab('perfil', this)">
+              <i class="fa-solid fa-id-card"></i> 1. Ficha do Paciente
+            </button>
+            <button type="button" class="nutri-tab-btn" onclick="switchNutriTab('dieta', this)">
+              <i class="fa-solid fa-utensils text-red"></i> 2. Prescrição de Dieta (Aba 08_Prescrição Nutricional)
+            </button>
+            <button type="button" class="nutri-tab-btn" onclick="switchNutriTab('avaliacao', this)">
+              <i class="fa-solid fa-weight-scale"></i> 3. Lançar Avaliação
+            </button>
+            <button type="button" class="nutri-tab-btn" onclick="switchNutriTab('exames', this)">
+              <i class="fa-solid fa-vial"></i> 4. Lançar Exames
+            </button>
+            <button type="button" class="nutri-tab-btn" onclick="switchNutriTab('gsheet', this)">
+              <i class="fa-solid fa-file-excel"></i> 5. Google Sheets
+            </button>
+          </div>
+
+          <!-- NUTRI TAB 1: FICHA & DADOS DO PACIENTE (ABA 01 & ABA 03 INTEGRAL) -->
+          <div id="nutri-tab-perfil" class="nutri-tab-panel margin-top" style="display: block;">
+            
+            <!-- SUB-HEADER FOR ABA 01, ABA 03 & RESUMO CONSOLIDADO -->
+            <div class="perfil-sub-tabs">
+              <button type="button" class="perfil-tab-btn active" onclick="switchPerfilSection('aba01', this)">
+                <i class="fa-solid fa-id-card text-red"></i> 1. Aba 01 — Perfil & Anamnese Clínica
+              </button>
+              <button type="button" class="perfil-tab-btn" onclick="switchPerfilSection('aba03', this)">
+                <i class="fa-solid fa-clipboard-question text-red"></i> 2. Aba 03 — Questionário Alimentar & R24h
+              </button>
+              <button type="button" class="perfil-tab-btn" onclick="switchPerfilSection('resumo', this)">
+                <i class="fa-solid fa-chart-pie text-red"></i> 3. Resumo Consolidado
+              </button>
+            </div>
+
+            <!-- SECTION ABA 01: PERFIL DO PACIENTE & ANAMNESE CLÍNICA (ESTRUTURA EXATA PLANILHA) -->
+            <div id="perfil-sec-aba01" class="perfil-section-panel margin-top" style="display: block;">
+              <form id="form-aba01" onsubmit="handleNutriSaveAba01(event)" oninput="triggerRealTimeAutoSave()" onchange="triggerRealTimeAutoSave()" novalidate>
+                
+                <!-- BLOCO 1: DADOS BÁSICOS (IMAGEM 1) -->
+                <div class="card glass-card">
+                  <div class="card-header flex-between">
+                    <div>
+                      <h3 class="card-title text-red"><i class="fa-solid fa-id-card"></i> 1. DADOS BÁSICOS</h3>
+                      <p class="card-subtitle">Cadastro inicial do paciente (Aba 01_Anamnese)</p>
+                    </div>
+                    <div class="flex-center gap-sm">
+                      <div id="sync-status-indicator" class="sync-pill synced">
+                        <i class="fa-solid fa-cloud-check text-emerald-400"></i> <span>Sincronizado em tempo real</span>
+                      </div>
+                      <span class="badge-status success"><i class="fa-solid fa-check"></i> Aba 01 Ativa</span>
+                    </div>
+                  </div>
+
+                  <div class="nutri-form-grid">
+                    <div class="form-group col-span-6">
+                      <label><i class="fa-solid fa-user"></i> Nome</label>
+                      <input type="text" id="aba01-nome" value="Paulo Vitor R de Sousa" placeholder="Nome completo do paciente">
+                    </div>
+
+                    <div class="form-group col-span-3">
+                      <label><i class="fa-regular fa-calendar"></i> Data avaliação</label>
+                      <input type="date" id="aba01-data-aval" value="2026-07-09">
+                    </div>
+
+                    <div class="form-group col-span-3">
+                      <label><i class="fa-solid fa-venus-mars"></i> Sexo</label>
+                      <select id="aba01-sexo">
+                        <option value="Masculino" selected>Masculino</option>
+                        <option value="Feminino">Feminino</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-3">
+                      <label><i class="fa-solid fa-cake-candles"></i> Idade (anos)</label>
+                      <input type="number" step="0.01" id="aba01-idade" value="38.00">
+                    </div>
+
+                    <div class="form-group col-span-3">
+                      <label><i class="fa-solid fa-ruler-vertical"></i> Altura (m)</label>
+                      <input type="number" step="0.01" id="aba01-altura" value="1.93">
+                    </div>
+
+                    <div class="form-group col-span-3">
+                      <label><i class="fa-solid fa-weight-scale"></i> Peso atual (kg)</label>
+                      <input type="number" step="0.1" id="aba01-peso-atual" value="115.80">
+                    </div>
+
+                    <div class="form-group col-span-3">
+                      <label><i class="fa-solid fa-calculator text-blue"></i> Peso alvo (kg)</label>
+                      <input type="text" id="aba01-peso-alvo" value="107.99" readonly title="Calculado automaticamente na planilha (Aba 04_Antropometria H33)" style="background: rgba(255, 255, 255, 0.05); color: #94a3b8; cursor: not-allowed; font-weight: 700;">
+                    </div>
+
+                    <div class="form-group col-span-6">
+                      <label><i class="fa-solid fa-trophy"></i> Objetivo</label>
+                      <select id="aba01-objetivo">
+                        <option value="Perda de peso" selected>Perda de peso</option>
+                        <option value="Manutenção">Manutenção</option>
+                        <option value="Ganho de massa">Ganho de massa</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- BLOCO 2: PERFIL DE TREINO, ATIVIDADE E RECUPERAÇÃO (IMAGEM 2) -->
+                <div class="card glass-card margin-top">
+                  <div class="card-header">
+                    <div>
+                      <h3 class="card-title text-red"><i class="fa-solid fa-dumbbell"></i> 2. PERFIL DE TREINO, ATIVIDADE E RECUPERAÇÃO</h3>
+                      <p class="card-subtitle">Parâmetros de treino, cardio, rotina NEAT, sono e estresse</p>
+                    </div>
+                  </div>
+
+                  <div class="nutri-form-grid">
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-user-tag"></i> Tipo de paciente</label>
+                      <select id="aba01-tipo-paciente">
+                        <option value="Adulto geral">Adulto geral</option>
+                        <option value="Praticante recreativo" selected>Praticante recreativo</option>
+                        <option value="Atleta">Atleta</option>
+                        <option value="Idoso">Idoso</option>
+                        <option value="Clínico-metabólico">Clínico-metabólico</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-bolt"></i> Nível geral de treino</label>
+                      <select id="aba01-nivel-treino">
+                        <option value="Sem treino">Sem treino</option>
+                        <option value="Leve">Leve</option>
+                        <option value="Moderado">Moderado</option>
+                        <option value="Intenso" selected>Intenso</option>
+                        <option value="Atleta/alto volume">Atleta/alto volume</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-heart-pulse"></i> Tipo de cardio</label>
+                      <select id="aba01-tipo-cardio">
+                        <option value="Sem cardio">Sem cardio</option>
+                        <option value="Caminhada leve">Caminhada leve</option>
+                        <option value="Caminhada moderada">Caminhada moderada</option>
+                        <option value="Corrida">Corrida</option>
+                        <option value="Bicicleta">Bicicleta</option>
+                        <option value="Elíptico">Elíptico</option>
+                        <option value="HIIT" selected>HIIT</option>
+                        <option value="Intervalado">Intervalado</option>
+                        <option value="Natação">Natação</option>
+                        <option value="Outro">Outro</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-calendar-week"></i> Frequência de musculação</label>
+                      <select id="aba01-freq-musculacao">
+                        <option value="0x/semana">0x/semana</option>
+                        <option value="1x/semana">1x/semana</option>
+                        <option value="2x/semana">2x/semana</option>
+                        <option value="3x/semana">3x/semana</option>
+                        <option value="4x/semana">4x/semana</option>
+                        <option value="5x/semana">5x/semana</option>
+                        <option value="6x/semana" selected>6x/semana</option>
+                        <option value="7x/semana">7x/semana</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-layer-group"></i> Divisão de treino</label>
+                      <select id="aba01-divisao-treino">
+                        <option value="Full body">Full body</option>
+                        <option value="Upper/Lower">Upper/Lower</option>
+                        <option value="Push/Pull/Legs">Push/Pull/Legs</option>
+                        <option value="ABC" selected>ABC</option>
+                        <option value="ABCD">ABCD</option>
+                        <option value="ABCDE">ABCDE</option>
+                        <option value="Personalizado">Personalizado</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-gauge-high"></i> Volume por sessão</label>
+                      <select id="aba01-volume-sessao">
+                        <option value="Baixo">Baixo</option>
+                        <option value="Moderado">Moderado</option>
+                        <option value="Alto" selected>Alto</option>
+                        <option value="Muito alto">Muito alto</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-person-running"></i> Cardio - frequência</label>
+                      <select id="aba01-cardio-freq">
+                        <option value="0x/semana">0x/semana</option>
+                        <option value="1x/semana">1x/semana</option>
+                        <option value="2x/semana">2x/semana</option>
+                        <option value="3x/semana">3x/semana</option>
+                        <option value="4x/semana" selected>4x/semana</option>
+                        <option value="5x/semana">5x/semana</option>
+                        <option value="6x/semana">6x/semana</option>
+                        <option value="7x/semana">7x/semana</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-stopwatch"></i> Cardio - duração média</label>
+                      <select id="aba01-cardio-duracao">
+                        <option value="Até 15 min" selected>Até 15 min</option>
+                        <option value="15–20 min">15–20 min</option>
+                        <option value="20–30 min">20–30 min</option>
+                        <option value="30–45 min">30–45 min</option>
+                        <option value="45–60 min">45–60 min</option>
+                        <option value="Mais de 60 min">Mais de 60 min</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-fire-flame-curved"></i> Cardio - intensidade</label>
+                      <select id="aba01-cardio-intensidade">
+                        <option value="Leve">Leve</option>
+                        <option value="Moderada" selected>Moderada</option>
+                        <option value="Alta">Alta</option>
+                        <option value="Muito alta">Muito alta</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-person-walking"></i> NEAT / rotina diária</label>
+                      <select id="aba01-neat">
+                        <option value="Muito baixo">Muito baixo</option>
+                        <option value="Baixo" selected>Baixo</option>
+                        <option value="Moderado">Moderado</option>
+                        <option value="Alto">Alto</option>
+                        <option value="Muito alto">Muito alto</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-shoe-prints"></i> Passos diários</label>
+                      <select id="aba01-passos">
+                        <option value="<5.000">&lt;5.000</option>
+                        <option value="5.000–7.499" selected>5.000–7.499</option>
+                        <option value="7.500–9.999">7.500–9.999</option>
+                        <option value="10.000–12.499">10.000–12.499</option>
+                        <option value="12.500–15.000">12.500–15.000</option>
+                        <option value=">15.000">&gt;15.000</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-briefcase"></i> Trabalho / rotina</label>
+                      <select id="aba01-trabalho">
+                        <option value="Sentado" selected>Sentado</option>
+                        <option value="Misto">Misto</option>
+                        <option value="Em pé">Em pé</option>
+                        <option value="Ativo">Ativo</option>
+                        <option value="Braçal">Braçal</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-bed"></i> Sono médio</label>
+                      <select id="aba01-sono-medio">
+                        <option value="<5 h/noite">&lt;5 h/noite</option>
+                        <option value="5–6 h/noite">5–6 h/noite</option>
+                        <option value="6–7 h/noite">6–7 h/noite</option>
+                        <option value="7-8 h/noite" selected>7-8 h/noite</option>
+                        <option value=">8 h/noite">&gt;8 h/noite</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-moon"></i> Qualidade do sono</label>
+                      <select id="aba01-qualidade-sono">
+                        <option value="Ruim">Ruim</option>
+                        <option value="Regular">Regular</option>
+                        <option value="Boa" selected>Boa</option>
+                        <option value="Muito boa">Muito boa</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-brain"></i> Nível de estresse</label>
+                      <select id="aba01-nivel-estresse">
+                        <option value="Baixo">Baixo</option>
+                        <option value="Moderado" selected>Moderado</option>
+                        <option value="Alto">Alto</option>
+                        <option value="Muito alto">Muito alto</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-user-injured"></i> Lesões / limitações</label>
+                      <input type="text" id="aba01-lesoes" value="Nenhuma">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-medal"></i> Meta de performance</label>
+                      <select id="aba01-meta-performance">
+                        <option value="Força">Força</option>
+                        <option value="Hipertrofia" selected>Hipertrofia</option>
+                        <option value="Condicionamento">Condicionamento</option>
+                        <option value="Resistência">Resistência</option>
+                        <option value="Saúde">Saúde</option>
+                        <option value="Competição">Competição</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-apple-whole"></i> Dias com maior fome</label>
+                      <select id="aba01-maior-fome">
+                        <option value="Manhã" selected>Manhã</option>
+                        <option value="Tarde">Tarde</option>
+                        <option value="Noite">Noite</option>
+                        <option value="Pós-treino">Pós-treino</option>
+                        <option value="Fim de semana">Fim de semana</option>
+                        <option value="Variável">Variável</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-thumbs-up"></i> Adesão alimentar esperada</label>
+                      <select id="aba01-adesao-esperada">
+                        <option value="Baixa">Baixa</option>
+                        <option value="Moderada">Moderada</option>
+                        <option value="Alta" selected>Alta</option>
+                        <option value="Muito alta">Muito alta</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- BLOCO 3: ADESÃO, ROTINA ALIMENTAR E OBSERVAÇÕES (IMAGEM 3) -->
+                <div class="card glass-card margin-top">
+                  <div class="card-header">
+                    <div>
+                      <h3 class="card-title text-red"><i class="fa-solid fa-clipboard-check"></i> 3. ADESÃO, ROTINA ALIMENTAR E OBSERVAÇÕES</h3>
+                      <p class="card-subtitle">Preparo de refeições, restrições e controle da anamnese</p>
+                    </div>
+                  </div>
+
+                  <div class="nutri-form-grid">
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-kitchen-set"></i> Disponibilidade para cozinhar</label>
+                      <select id="aba01-cozinhar">
+                        <option value="Baixa">Baixa</option>
+                        <option value="Moderada">Moderada</option>
+                        <option value="Alta">Alta</option>
+                        <option value="Diariamente" selected>Diariamente</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-utensils"></i> Refeições fora de casa</label>
+                      <select id="aba01-refeicoes-fora">
+                        <option value="0x/semana">0x/semana</option>
+                        <option value="1x/semana" selected>1x/semana</option>
+                        <option value="2-3x/semana">2-3x/semana</option>
+                        <option value="4-5x/semana">4-5x/semana</option>
+                        <option value="Diariamente">Diariamente</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-shield-check text-green"></i> Status da Anamnese (Automático)</label>
+                      <div class="status-auto-card success" id="aba01-status-auto">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                        <span id="aba01-status-val">COMPLETA</span>
+                        <small style="opacity: 0.7; font-weight: normal;">(Validado na Planilha)</small>
+                      </div>
+                      <input type="hidden" id="aba01-status-anamnese" value="COMPLETA">
+                    </div>
+
+                    <div class="form-group col-span-6">
+                      <label><i class="fa-solid fa-comment-medical"></i> Observações adicionais de rotina</label>
+                      <input type="text" id="aba01-obs-rotina" value="Nenhuma">
+                    </div>
+
+                    <div class="form-group col-span-6">
+                      <label><i class="fa-solid fa-ban"></i> Restrições/alergias</label>
+                      <input type="text" id="aba01-restricoes" value="Nenhuma">
+                    </div>
+
+                    <div class="form-group col-span-6">
+                      <label><i class="fa-solid fa-heart"></i> Preferências alimentares</label>
+                      <input type="text" id="aba01-preferencias" value="Nenhuma">
+                    </div>
+
+                    <div class="form-group col-span-6">
+                      <label><i class="fa-solid fa-notes-medical"></i> Observações clínicas</label>
+                      <input type="text" id="aba01-obs-clinicas" value="Nenhuma">
+                    </div>
+
+                    <div class="col-span-12 form-actions">
+                      <button type="submit" class="btn-primary" id="btn-save-aba01">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> <span>Salvar & Sincronizar na Planilha Google Sheets</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- SECTION ABA 03: QUESTIONÁRIO ALIMENTAR INICIAL & R24H -->
+            <div id="perfil-sec-aba03" class="perfil-section-panel margin-top" style="display: none;">
+              <form onsubmit="handleNutriSaveAba03(event)">
+                
+                <!-- CARD 1: PREFERÊNCIAS E AVERSÕES -->
+                <div class="card glass-card">
+                  <div class="card-header">
+                    <div>
+                      <h3 class="card-title"><i class="fa-solid fa-heart text-red"></i> Preferências & Aversões Alimentares</h3>
+                      <p class="card-subtitle">Alimentos que o paciente ama ou odeia consumir da Aba 03</p>
+                    </div>
+                  </div>
+
+                  <div class="nutri-form-grid">
+                    <div class="form-group col-span-6">
+                      <label><i class="fa-solid fa-thumbs-up text-emerald"></i> Alimentos Preferidos / Favoritos</label>
+                      <textarea id="aba03-favorite-foods" rows="3">Ovos, Peito de Frango, Arroz com Feijão, Batata Doce, Aveia, Iogurte Natural, Frutas e Castanhas.</textarea>
+                    </div>
+
+                    <div class="form-group col-span-6">
+                      <label><i class="fa-solid fa-thumbs-down text-red"></i> Alimentos Aversivos / Rejeitados</label>
+                      <textarea id="aba03-disliked-foods" rows="3">Fígado bovino, Quiabo, Peixe enlatado com óleo em excesso.</textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CARD 2: COMPORTAMENTO E GATILHOS -->
+                <div class="card glass-card margin-top">
+                  <div class="card-header">
+                    <div>
+                      <h3 class="card-title"><i class="fa-solid fa-brain text-red"></i> Comportamento Alimentar & Fome Emocional</h3>
+                      <p class="card-subtitle">Gatilhos, horários críticos e hábitos diários</p>
+                    </div>
+                  </div>
+
+                  <div class="nutri-form-grid">
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-utensils"></i> Nº de Refeições Desejadas/Dia</label>
+                      <input type="text" id="aba03-meals-per-day" value="5 a 6 refeições fracionadas">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-clock"></i> Horário de Maior Fome / Compulsão</label>
+                      <input type="text" id="aba03-hunger-peak" value="Fim da tarde (16:00 às 18:00) / Pós-trabalho">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-cookie-bite"></i> Vontade de Doces / Açúcar</label>
+                      <input type="text" id="aba03-sweet-cravings" value="Moderada (À noite por ansiedade pós-rotina)">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-user-chef"></i> Quem Prepara as Refeições?</label>
+                      <input type="text" id="aba03-who-cooks" value="O próprio paciente cozinha aos domingos (Meal Prep)">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-house-user"></i> Onde Realiza o Almoço?</label>
+                      <input type="text" id="aba03-lunch-place" value="No trabalho (leva marmita preparada)">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-face-smile"></i> Adesão Esperada ao Plano</label>
+                      <input type="text" id="aba03-adherence" value="Alta (94%) — Cozinha diariamente e segue rotina">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CARD 3: BEBIDAS, SOCIAL E SINTOMAS DIGESTIVOS -->
+                <div class="card glass-card margin-top">
+                  <div class="card-header">
+                    <div>
+                      <h3 class="card-title"><i class="fa-solid fa-wine-glass text-red"></i> Consumo Social & Sintomas Digestivos</h3>
+                      <p class="card-subtitle">Bebida alcoólica, refeições livres, café e sensações pós-refeição</p>
+                    </div>
+                  </div>
+
+                  <div class="nutri-form-grid">
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-wine-glass"></i> Consumo de Bebida Alcoólica</label>
+                      <input type="text" id="aba03-alcohol" value="Raro (1x a 2x no mês em ocasiões especiais)">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-burger"></i> Frequência de Fast Food / Delivery</label>
+                      <input type="text" id="aba03-fast-food" value="1x no final de semana (Refeição livre consciente)">
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-mug-saucer"></i> Consumo de Café / Cafeína</label>
+                      <input type="text" id="aba03-coffee" value="2 xícaras por dia (sem açúcar ou adoçante)">
+                    </div>
+
+                    <div class="form-group col-span-6">
+                      <label><i class="fa-solid fa-stopwatch"></i> Velocidade de Mastigação</label>
+                      <input type="text" id="aba03-chewing-speed" value="Moderada (aproximadamente 20 min por refeição)">
+                    </div>
+
+                    <div class="form-group col-span-6">
+                      <label><i class="fa-solid fa-stomach"></i> Sintomas Digestivos (Azia / Refluxo)</label>
+                      <input type="text" id="aba03-digestive-symptoms" value="Sem refluxo, azia ou estufamento frequente.">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CARD 4: RECORDATÓRIO ALIMENTAR HABITUAL (ANAMNESE 24H) -->
+                <div class="card glass-card margin-top">
+                  <div class="card-header">
+                    <div>
+                      <h3 class="card-title"><i class="fa-solid fa-calendar-day text-red"></i> Recordatório Alimentar Habitual (R24h — Rotina Anterior)</h3>
+                      <p class="card-subtitle">Refeições habituais consumidas antes do plano prescrítico</p>
+                    </div>
+                  </div>
+
+                  <div class="nutri-form-grid">
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-mug-hot"></i> Café da Manhã Habitual</label>
+                      <textarea id="aba03-r24h-cafe" rows="2">Café com leite em pó, pão francês com ovo mexido ou queijo.</textarea>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-apple-whole"></i> Lanche da Manhã Habitual</label>
+                      <textarea id="aba03-r24h-lanche-m" rows="2">Iogurte natural com aveia em flocos ou dose de whey protein.</textarea>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-bowl-rice"></i> Almoço Habitual</label>
+                      <textarea id="aba03-r24h-almoco" rows="2">Arroz branco, feijão carioca, peito de frango grelhado e salada verde.</textarea>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-dumbbell"></i> Lanche da Tarde / Pré-Treino Habitual</label>
+                      <textarea id="aba03-r24h-pre-treino" rows="2">Iogurte natural com aveia em flocos, leite em pó e banana.</textarea>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-utensils"></i> Jantar Habitual</label>
+                      <textarea id="aba03-r24h-jantar" rows="2">Prato similar ao almoço (frango, arroz, feijão) ou omelete reforçado.</textarea>
+                    </div>
+
+                    <div class="form-group col-span-4">
+                      <label><i class="fa-solid fa-moon"></i> Ceia Habitual</label>
+                      <textarea id="aba03-r24h-ceia" rows="2">Ceia leve com chá de camomila ou dose de proteína suplementar.</textarea>
+                    </div>
+
+                    <div class="col-span-12 form-actions">
+                      <button type="submit" class="btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Salvar Todos os Dados da Aba 03
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- SECTION 3: RESUMO CONSOLIDADO DA ANAMNESE -->
+            <div id="perfil-sec-resumo" class="perfil-section-panel margin-top" style="display: none;">
+              <div class="card glass-card">
+                <div class="card-header flex-between">
+                  <div>
+                    <h3 class="card-title"><i class="fa-solid fa-chart-pie text-red"></i> Resumo Consolidado do Paciente (Abas 01 & 03)</h3>
+                    <p class="card-subtitle">Visão executiva sintetizando o perfil clínico e hábitos alimentares</p>
+                  </div>
+                  <span class="badge-status success"><i class="fa-solid fa-check-double"></i> Ficha Validada</span>
+                </div>
+
+                <div class="nutri-summary-grid margin-top">
+                  <div class="summary-box">
+                    <h5><i class="fa-solid fa-user text-red"></i> Paciente</h5>
+                    <strong id="sum-name">Paulo Vitor Ribeiro de Sousa</strong>
+                    <small>38 anos | Masculino | Engenheiro de Software</small>
+                  </div>
+
+                  <div class="summary-box">
+                    <h5><i class="fa-solid fa-weight-scale text-amber"></i> Antropometria Inicial</h5>
+                    <strong id="sum-weight">122.0 kg | 1.93 m | 24.5% BF</strong>
+                    <small>Cintura: 112 cm | Meta: 107.99 kg</small>
+                  </div>
+
+                  <div class="summary-box">
+                    <h5><i class="fa-solid fa-bullseye text-emerald"></i> Objetivo & Rotina</h5>
+                    <strong id="sum-obj">Emagrecimento & Recomposição</strong>
+                    <small>Musculação 6x | Cardio HIIT 4x</small>
+                  </div>
+
+                  <div class="summary-box">
+                    <h5><i class="fa-solid fa-notes-medical text-purple"></i> Status Clínico</h5>
+                    <strong id="sum-health">Sem comorbidades crônicas</strong>
+                    <small>Sem alergias relatadas | Intestino regular</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- NUTRI TAB 2: PRESCRIÇÃO DE DIETA (ABA 08_PRESCRIÇÃO NUTRICIONAL) -->
+          <div id="nutri-tab-dieta" class="nutri-tab-panel margin-top" style="display: none;">
+            <div class="card glass-card margin-bottom" style="border-left: 4px solid var(--accent-red);">
+              <div class="card-header flex-between">
+                <div>
+                  <h3 class="card-title text-red"><i class="fa-solid fa-utensils"></i> 2. Prescrição de Dieta (Aba 08_Prescrição Nutricional)</h3>
+                  <p class="card-subtitle">Prescrição nutricional em 4 quadros interligados em tempo real com a planilha Google Sheets</p>
+                </div>
+                <div class="flex-center gap-sm">
+                  <span class="sync-pill synced" id="aba08-sync-status"><i class="fa-solid fa-cloud-check"></i> Sincronizado com Aba 08</span>
+                  <button type="button" class="btn-secondary" onclick="fetchDietaAba08FromGoogleSheets()" style="padding: 0.35rem 0.75rem;">
+                    <i class="fa-solid fa-rotate text-emerald"></i> Sincronizar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- CONTAINER DINÂMICO DOS 4 QUADROS DA ABA 08 -->
+            <div id="aba08-diet-list-container">
+              <div class="loading-spinner text-center p-md">
+                <i class="fa-solid fa-spinner fa-spin fa-2x text-red"></i>
+                <p class="margin-top-sm" style="color: #94a3b8;">Carregando os 4 quadros da Aba 08_Prescrição Nutricional...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- NUTRI TAB 3: LANÇAR AVALIAÇÃO CORPORAL -->
+          <div id="nutri-tab-avaliacao" class="nutri-tab-panel margin-top" style="display: none;">
+            <div class="card glass-card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-weight-scale"></i> Nova Avaliação Física / Antropométrica</h3>
+                  <p class="card-subtitle">Insira os novos dados de peso, % de gordura e circunferências para gerar os gráficos</p>
+                </div>
+              </div>
+              <form onsubmit="handleNutriSaveEvaluation(event)" class="nutri-form-grid">
+                <div class="form-group col-span-3">
+                  <label><i class="fa-regular fa-calendar"></i> Data da Avaliação</label>
+                  <input type="date" id="nutri-eval-date" required>
+                </div>
+                <div class="form-group col-span-3">
+                  <label><i class="fa-solid fa-weight-scale"></i> Peso Corporal (kg)</label>
+                  <input type="number" step="0.1" id="nutri-eval-weight" placeholder="115.8" required>
+                </div>
+                <div class="form-group col-span-3">
+                  <label><i class="fa-solid fa-percent"></i> % Gordura Corporal</label>
+                  <input type="number" step="0.1" id="nutri-eval-fat" placeholder="17.9" required>
+                </div>
+                <div class="form-group col-span-3">
+                  <label><i class="fa-solid fa-dumbbell"></i> Massa Magra (kg)</label>
+                  <input type="number" step="0.1" id="nutri-eval-muscle" placeholder="95.0">
+                </div>
+                <div class="form-group col-span-4">
+                  <label><i class="fa-solid fa-ruler-horizontal"></i> Circunferência Cintura (cm)</label>
+                  <input type="number" step="0.5" id="nutri-eval-waist" placeholder="101.0">
+                </div>
+                <div class="form-group col-span-4">
+                  <label><i class="fa-solid fa-ruler-horizontal"></i> Circunferência Abdômen (cm)</label>
+                  <input type="number" step="0.5" id="nutri-eval-abdomen" placeholder="102.0">
+                </div>
+                <div class="form-group col-span-4">
+                  <label><i class="fa-solid fa-ruler-horizontal"></i> Circunferência Quadril (cm)</label>
+                  <input type="number" step="0.5" id="nutri-eval-hip" placeholder="111.5">
+                </div>
+                <div class="col-span-12 form-actions">
+                  <button type="submit" class="btn-primary">
+                    <i class="fa-solid fa-chart-line"></i> Registrar Avaliação no Portal do Paciente
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- NUTRI TAB 4: LANÇAR EXAMES CLÍNICOS -->
+          <div id="nutri-tab-exames" class="nutri-tab-panel margin-top" style="display: none;">
+            <div class="card glass-card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-vial"></i> Lançar Laudo de Exames Laboratoriais</h3>
+                  <p class="card-subtitle">Cadastre o resultado de exames clínicos para acompanhamento médico</p>
+                </div>
+              </div>
+              <form onsubmit="handleNutriSaveExam(event)" class="nutri-form-grid">
+                <div class="form-group col-span-4">
+                  <label><i class="fa-solid fa-vial"></i> Nome do Exame</label>
+                  <input type="text" id="nutri-exam-name" placeholder="Ex: Glicemia de Jejum" required>
+                </div>
+                <div class="form-group col-span-3">
+                  <label><i class="fa-solid fa-hashtag"></i> Valor Encontrado</label>
+                  <input type="text" id="nutri-exam-val" placeholder="Ex: 88 mg/dL" required>
+                </div>
+                <div class="form-group col-span-3">
+                  <label><i class="fa-solid fa-compass"></i> Faixa de Referência</label>
+                  <input type="text" id="nutri-exam-ref" placeholder="Ex: 70 a 99 mg/dL">
+                </div>
+                <div class="form-group col-span-2">
+                  <label><i class="fa-solid fa-heart-pulse"></i> Status Clínico</label>
+                  <select id="nutri-exam-status">
+                    <option value="Ótimo">🟢 Ótimo</option>
+                    <option value="Normal">🟢 Normal</option>
+                    <option value="Atenção">🟡 Atenção</option>
+                    <option value="Alterado">🔴 Alterado</option>
+                  </select>
+                </div>
+                <div class="col-span-12 form-actions">
+                  <button type="submit" class="btn-primary">
+                    <i class="fa-solid fa-plus-circle"></i> Cadastrar Exame no Portal
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- NUTRI TAB 5: GOOGLE SHEETS CONNECTOR -->
+          <div id="nutri-tab-gsheet" class="nutri-tab-panel margin-top" style="display: none;">
+            <div class="card glass-card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-file-excel text-emerald"></i> Sincronização e Configuração do Google Sheets</h3>
+                  <p class="card-subtitle">Gerencie o Web App do Google Apps Script publicado para sincronização remota da aba 12_App do Paciente</p>
+                </div>
+              </div>
+
+              <div class="gs-config-box margin-top">
+                <div id="gs-status-bar" class="gs-status-banner">
+                  <i class="fa-solid fa-file-excel"></i>
+                  <div>
+                    <h4 id="gs-status-title">🟢 Conectado ao Google Sheets</h4>
+                    <p id="gs-status-desc">Sincronização remota ativa</p>
+                  </div>
+                </div>
+
+                <div class="gs-actions-row margin-top">
+                  <button type="button" class="btn-secondary" onclick="configureGoogleSheetsUrl()">
+                    <i class="fa-solid fa-link"></i> <span id="gs-btn-text">Alterar URL do Web App</span>
+                  </button>
+                  <button type="button" class="btn-primary" id="gs-test-btn" onclick="testGoogleSheetsConnection()">
+                    <i class="fa-solid fa-paper-plane"></i> Testar Conexão com Planilha
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- TAB 6: ATIVIDADES FÍSICAS, TREINO & METS (NATIVO & CIENTÍFICO 360°) -->
+        <section id="tab-atividades" class="tab-panel">
+          <div class="card glass-card">
+            <div class="card-header flex-between">
+              <div>
+                <h3 class="card-title text-emerald"><i class="fa-solid fa-person-running"></i> Central 360° de Atividades Físicas, METs & Gasto Energético</h3>
+                <p class="card-subtitle">Cálculo científico de gasto bruto/líquido, efeito EPOC, zonas de frequência cardíaca (Tanaka/Karvonen) e integração ao GET</p>
+              </div>
+              <div class="flex-center gap-sm">
+                <span class="badge-pill" style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4);">
+                  <i class="fa-solid fa-bolt"></i> Compêndio METs 2024 / ACSM
+                </span>
+              </div>
+            </div>
+
+            <!-- PANEL 1: DESMEMBRAMENTO TOTAL DO GASTO ENERGÉTICO DIÁRIO (GET / TDEE BREAKDOWN) -->
+            <div class="card glass-card margin-top" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.4);">
+              <h4 class="card-title text-emerald" style="font-size: 1.05rem;"><i class="fa-solid fa-chart-pie"></i> Desmembramento Total do Gasto Energético (GET / TDEE)</h4>
+              <p class="card-subtitle">Cálculo integrado dos 5 componentes do metabolismo corporal</p>
+
+              <div class="nutri-summary-grid margin-top-sm">
+                <div class="summary-box" style="background: rgba(30, 41, 59, 0.6); padding: 0.8rem;">
+                  <span style="color: #94a3b8; font-size: 0.8rem;"><i class="fa-solid fa-bed text-blue-400"></i> 1. Basal (TMB)</span>
+                  <h3 style="color: #60a5fa; margin: 0.2rem 0;">2.423 <small style="font-size: 0.8rem;">kcal</small></h3>
+                  <small style="color: #64748b;">Mifflin-St Jeor (1990)</small>
+                </div>
+
+                <div class="summary-box" style="background: rgba(30, 41, 59, 0.6); padding: 0.8rem;">
+                  <span style="color: #94a3b8; font-size: 0.8rem;"><i class="fa-solid fa-shoe-prints text-emerald"></i> 2. NEAT (Passos/Rotina)</span>
+                  <h3 style="color: #34d399; margin: 0.2rem 0;">350 <small style="font-size: 0.8rem;">kcal</small></h3>
+                  <small style="color: #64748b;">7.500 passos + Trabalho</small>
+                </div>
+
+                <div class="summary-box" style="background: rgba(30, 41, 59, 0.6); padding: 0.8rem;">
+                  <span style="color: #94a3b8; font-size: 0.8rem;"><i class="fa-solid fa-dumbbell text-amber"></i> 3. EEE (Treinos METs)</span>
+                  <h3 id="get-summary-eee" style="color: #fbbf24; margin: 0.2rem 0;">926 <small style="font-size: 0.8rem;">kcal</small></h3>
+                  <small style="color: #64748b;">Soma dos treinos do dia</small>
+                </div>
+
+                <div class="summary-box" style="background: rgba(30, 41, 59, 0.6); padding: 0.8rem;">
+                  <span style="color: #94a3b8; font-size: 0.8rem;"><i class="fa-solid fa-bolt text-cyan"></i> 4. EPOC (Pós-Treino)</span>
+                  <h3 id="get-summary-epoc" style="color: #38bdf8; margin: 0.2rem 0;">74 <small style="font-size: 0.8rem;">kcal</small></h3>
+                  <small style="color: #64748b;">Efeito metabólico estendido</small>
+                </div>
+
+                <div class="summary-box" style="background: rgba(30, 41, 59, 0.6); padding: 0.8rem;">
+                  <span style="color: #94a3b8; font-size: 0.8rem;"><i class="fa-solid fa-apple-whole text-purple"></i> 5. TEF (Efeito Dieta)</span>
+                  <h3 style="color: #c084fc; margin: 0.2rem 0;">284 <small style="font-size: 0.8rem;">kcal</small></h3>
+                  <small style="color: #64748b;">10% das 2.840 kcal diárias</small>
+                </div>
+              </div>
+
+              <div class="margin-top-sm p-sm" style="background: rgba(16, 185, 129, 0.15); border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.3); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <strong style="color: #10b981; font-size: 1.1rem;"><i class="fa-solid fa-calculator"></i> Gasto Energético Total Real (GET Consolidado):</strong>
+                  <span style="color: #94a3b8; font-size: 0.85rem; display: block;">TMB (2.423) + NEAT (350) + EEE (926) + EPOC (74) + TEF (284)</span>
+                </div>
+                <h2 id="get-summary-total" style="color: #10b981; margin: 0; font-size: 2rem;">4.057 <small style="font-size: 1rem;">kcal/dia</small></h2>
+              </div>
+            </div>
+
+            <!-- CALCULADORA CIENTÍFICA DE METS E EPOC (COMPÊNDIO 40+ MODALIDADES) -->
+            <div class="nutri-form-grid margin-top p-md" style="background: rgba(15, 23, 42, 0.6); border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.3);">
+              <div class="form-group col-span-5">
+                <label><i class="fa-solid fa-dumbbell"></i> Modalidade Esportiva (Compêndio de Ainsworth 2024)</label>
+                <select id="met-exercise-select" onchange="calculateMetCaloricExpenditure()">
+                  <optgroup label="💪 Musculação & Treinamento de Força">
+                    <option value="6.0">Musculação - Treino Tradicional (MET 6.0)</option>
+                    <option value="8.0" selected>Musculação - Hipertrofia Intensa (MET 8.0)</option>
+                    <option value="9.0">Powerlifting / Força Máxima (MET 9.0)</option>
+                    <option value="7.5">Calistenia / Peso Corporal (MET 7.5)</option>
+                    <option value="8.5">Levantamento Olímpico LPO (MET 8.5)</option>
+                  </optgroup>
+
+                  <optgroup label="🏃 Cardio & Corrida">
+                    <option value="3.0">Caminhada Leve (4 km/h) (MET 3.0)</option>
+                    <option value="4.5">Caminhada Rápida (6 km/h) (MET 4.5)</option>
+                    <option value="6.0">Trotar / Jogging (7 km/h) (MET 6.0)</option>
+                    <option value="8.3">Corrida Z2 Base (8 km/h) (MET 8.3)</option>
+                    <option value="9.8">Corrida Moderada (10 km/h) (MET 9.8)</option>
+                    <option value="11.5">Corrida Rápida (12 km/h) (MET 11.5)</option>
+                    <option value="14.5">Tiro de Velocidade (15 km/h) (MET 14.5)</option>
+                  </optgroup>
+
+                  <optgroup label="🚴 Ciclismo & Spin">
+                    <option value="4.0">Ciclismo Lazer (15 km/h) (MET 4.0)</option>
+                    <option value="7.5">Ciclismo Moderado (20 km/h) (MET 7.5)</option>
+                    <option value="10.0">Ciclismo Intenso (25 km/h) (MET 10.0)</option>
+                    <option value="8.5">Spinning / Bike Indoor Intenso (MET 8.5)</option>
+                    <option value="8.5">Mountain Bike Trilha (MET 8.5)</option>
+                  </optgroup>
+
+                  <optgroup label="🏊 Natação & Aquáticos">
+                    <option value="5.0">Natação Lazer (MET 5.0)</option>
+                    <option value="8.0">Natação Crawl Moderado (MET 8.0)</option>
+                    <option value="11.0">Natação Borboleta / Intenso (MET 11.0)</option>
+                    <option value="4.0">Hidroginástica (MET 4.0)</option>
+                    <option value="5.0">Surf (MET 5.0)</option>
+                  </optgroup>
+
+                  <optgroup label="🥋 Lutas & Artes Marciais">
+                    <option value="10.5">Jiu-Jitsu / Grappling (MET 10.5)</option>
+                    <option value="10.0">Muay Thai / Kickboxing (MET 10.0)</option>
+                    <option value="9.0">Boxe Sparring (MET 9.0)</option>
+                    <option value="8.5">Judô / Karatê (MET 8.5)</option>
+                    <option value="8.0">Capoeira (MET 8.0)</option>
+                  </optgroup>
+
+                  <optgroup label="⚽ Esportes Coletivos & Quadra">
+                    <option value="7.0">Futebol Recreativo (MET 7.0)</option>
+                    <option value="10.0">Futebol Competitivo (MET 10.0)</option>
+                    <option value="8.0">Basquete (MET 8.0)</option>
+                    <option value="8.0">Vôlei de Praia (MET 8.0)</option>
+                    <option value="7.0">Beach Tennis (MET 7.0)</option>
+                    <option value="7.3">Tênis de Campo (MET 7.3)</option>
+                    <option value="6.8">Padel (MET 6.8)</option>
+                  </optgroup>
+
+                  <optgroup label="🏋️ Crossfit & Funcional">
+                    <option value="8.5">WOD Metcon Crossfit (MET 8.5)</option>
+                    <option value="10.0">HIIT Tabata (MET 10.0)</option>
+                    <option value="9.0">Escada / Stairmaster Intenso (MET 9.0)</option>
+                    <option value="8.5">Remo Indoor Ergométrico (MET 8.5)</option>
+                  </optgroup>
+
+                  <optgroup label="💃 Dança & Fitness">
+                    <option value="6.5">Zumba / FitDance (MET 6.5)</option>
+                    <option value="4.5">Dança de Salão (MET 4.5)</option>
+                  </optgroup>
+
+                  <optgroup label="🔨 Trabalho Braçal & Afazeres">
+                    <option value="3.5">Serviço Doméstico Intenso (MET 3.5)</option>
+                    <option value="6.5">Trabalho de Construção/Braçal (MET 6.5)</option>
+                    <option value="4.0">Jardinagem (MET 4.0)</option>
+                  </optgroup>
+                </select>
+              </div>
+
+              <div class="form-group col-span-2">
+                <label><i class="fa-solid fa-stopwatch"></i> Duração (min)</label>
+                <input type="number" id="met-duration-input" value="60" min="5" max="300" onchange="calculateMetCaloricExpenditure()">
+              </div>
+
+              <div class="form-group col-span-2">
+                <label><i class="fa-solid fa-weight-scale"></i> Peso (kg)</label>
+                <input type="number" id="met-weight-input" value="115.8" step="0.1" onchange="calculateMetCaloricExpenditure()">
+              </div>
+
+              <div class="form-group col-span-3" style="display: flex; align-items: flex-end;">
+                <button type="button" class="btn-primary" onclick="addWorkoutToDailyLog()" style="width: 100%; height: 42px; background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                  <i class="fa-solid fa-plus-circle"></i> Lançar Treino no GET do Dia
+                </button>
+              </div>
+            </div>
+
+            <!-- CARDS DE RESULTADO DE METS, EPOC E GASTO LÍQUIDO -->
+            <div class="dashboard-row margin-top">
+              <div class="card glass-card col-span-4" style="background: rgba(15, 23, 42, 0.6); text-align: center;">
+                <span style="color: #94a3b8; font-size: 0.85rem;"><i class="fa-solid fa-fire text-amber"></i> Gasto Calórico Bruto</span>
+                <h2 id="met-calculated-gross" style="color: #fbbf24; margin: 0.3rem 0; font-size: 1.8rem;">926 <small style="font-size: 0.9rem;">kcal</small></h2>
+                <small style="color: #64748b;">Consumo total durante o treino</small>
+              </div>
+
+              <div class="card glass-card col-span-4" style="background: rgba(15, 23, 42, 0.6); text-align: center;">
+                <span style="color: #94a3b8; font-size: 0.85rem;"><i class="fa-solid fa-fire-flame-simple text-emerald"></i> Gasto Calórico Líquido</span>
+                <h2 id="met-calculated-net" style="color: #34d399; margin: 0.3rem 0; font-size: 1.8rem;">811 <small style="font-size: 0.9rem;">kcal</small></h2>
+                <small style="color: #64748b;">Descontando a TMB em repouso</small>
+              </div>
+
+              <div class="card glass-card col-span-4" style="background: rgba(15, 23, 42, 0.6); text-align: center;">
+                <span style="color: #94a3b8; font-size: 0.85rem;"><i class="fa-solid fa-bolt text-cyan"></i> EPOC Estimado (Pós-Treino)</span>
+                <h2 id="met-calculated-epoc" style="color: #38bdf8; margin: 0.3rem 0; font-size: 1.8rem;">+74 <small style="font-size: 0.9rem;">kcal (8%)</small></h2>
+                <small style="color: #64748b;">Consumo calórico pós-esforço (12-24h)</small>
+              </div>
+            </div>
+
+            <!-- RESULTADO E ZONAS DE FREQUÊNCIA CARDÍACA DINÂMICAS -->
+            <div class="dashboard-row margin-top">
+              <div class="card glass-card col-span-6" style="background: rgba(15, 23, 42, 0.6);">
+                <div class="flex-between">
+                  <h4 class="card-title text-emerald" style="font-size: 1rem;"><i class="fa-solid fa-heart-pulse"></i> Calculadora de Zonas de Frequência Cardíaca (Tanaka & Karvonen)</h4>
+                  <small style="color: #94a3b8;">Baseado na FC de Reserva</small>
+                </div>
+                
+                <div class="nutri-form-grid margin-top-sm">
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-solid fa-calendar"></i> Idade do Paciente (anos)</label>
+                    <input type="number" id="hr-age-input" value="38" onchange="calculateHeartRateZonesUI()">
+                  </div>
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-solid fa-bed"></i> FC de Repouso (bpm)</label>
+                    <input type="number" id="hr-rest-input" value="62" onchange="calculateHeartRateZonesUI()">
+                  </div>
+                </div>
+
+                <div class="margin-top-sm p-xs" style="background: rgba(30, 41, 59, 0.4); border-radius: 8px;">
+                  <p style="font-size: 0.85rem; color: #cbd5e1; margin-bottom: 0.4rem;">
+                    <strong>FC Máxima (Tanaka):</strong> <span id="hr-max-val" style="color: #10b981; font-weight: 700;">181 bpm</span> | 
+                    <strong>FC de Reserva (Karvonen):</strong> <span id="hr-reserve-val" style="color: #38bdf8; font-weight: 700;">119 bpm</span>
+                  </p>
+                </div>
+
+                <ul style="list-style: none; padding: 0; margin-top: 0.75rem;" class="hr-zones-list">
+                  <li style="padding: 0.4rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1); display: flex; justify-content: space-between;">
+                    <span>🟢 Zona 1 (Recuperação / Lipólise):</span>
+                    <strong id="hr-z1-val">121 - 133 bpm (50-60%)</strong>
+                  </li>
+                  <li style="padding: 0.4rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1); display: flex; justify-content: space-between;">
+                    <span>🔵 Zona 2 (Base Aeróbica / FatMax):</span>
+                    <strong id="hr-z2-val">133 - 145 bpm (60-70%)</strong>
+                  </li>
+                  <li style="padding: 0.4rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1); display: flex; justify-content: space-between;">
+                    <span>🟡 Zona 3 (Limiar Anaeróbico / Performance):</span>
+                    <strong id="hr-z3-val">145 - 157 bpm (70-80%)</strong>
+                  </li>
+                  <li style="padding: 0.4rem 0; border-bottom: 1px dashed rgba(255,255,255,0.1); display: flex; justify-content: space-between;">
+                    <span>🟠 Zona 4 (VO2 Máximo / HIIT):</span>
+                    <strong id="hr-z4-val">157 - 169 bpm (80-90%)</strong>
+                  </li>
+                  <li style="padding: 0.4rem 0; display: flex; justify-content: space-between;">
+                    <span>🔴 Zona 5 (Esforço Máximo Anaeróbico):</span>
+                    <strong id="hr-z5-val">> 169 bpm (90-100%)</strong>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- PRESCRIÇÃO NUTRICIONAL ESPORTIVA ASSOCIADA -->
+              <div class="card glass-card col-span-6" style="background: rgba(15, 23, 42, 0.6);">
+                <h4 class="card-title text-amber" style="font-size: 1rem;"><i class="fa-solid fa-bottle-water"></i> Prescrição Esportiva & Reposição Hídrica/Glicogênio</h4>
+                <p class="card-subtitle">Estratégia nutricional associada ao gasto do treino</p>
+
+                <div style="margin-top: 1rem; font-size: 0.9rem; line-height: 1.7; color: #cbd5e1;">
+                  <p><strong>• Hidratação durante o treino:</strong> 500 ml a 750 ml de água com sais por hora de treino intenso.</p>
+                  <p><strong>• Reposição de Eletrólitos:</strong> 500mg Sódio + 150mg Potássio + 100mg Magnésio para sessões > 60 min.</p>
+                  <p><strong>• Intra-Treino (Carboidratos):</strong> Recomendado 30g a 45g de Ciclodextrina / Palatinose se a sessão exceder 75 min.</p>
+                  <p><strong>• Pós-Treino (Recuperação de Glicogênio):</strong> 0.8g a 1.2g de carboidratos/kg + 0.4g de proteína/kg nas primeiras 2h pós-esforço.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- LOG DE TREINOS REGISTRADOS NO DIA -->
+            <div class="margin-top card glass-card" style="background: rgba(15, 23, 42, 0.6);">
+              <h4 class="card-title text-emerald" style="font-size: 1rem;"><i class="fa-solid fa-list-check"></i> Treinos Registrados no Diário do Paciente (Hoje)</h4>
+              
+              <div style="overflow-x: auto;" class="margin-top-sm">
+                <table class="history-table" style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                    <tr style="background: rgba(30, 41, 59, 0.8);">
+                      <th style="padding: 0.65rem; text-align: left;">Modalidade</th>
+                      <th style="padding: 0.65rem; text-align: center;">MET</th>
+                      <th style="padding: 0.65rem; text-align: center;">Duração</th>
+                      <th style="padding: 0.65rem; text-align: center;">Gasto Bruto</th>
+                      <th style="padding: 0.65rem; text-align: center;">Gasto Líquido</th>
+                      <th style="padding: 0.65rem; text-align: center;">Efeito EPOC</th>
+                      <th style="padding: 0.65rem; text-align: center;">Status GET</th>
+                    </tr>
+                  </thead>
+                  <tbody id="workout-log-table-body">
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem;">
+                      <td style="padding: 0.65rem;"><strong>Musculação - Hipertrofia Intensa</strong></td>
+                      <td style="padding: 0.65rem; text-align: center;">8.0</td>
+                      <td style="padding: 0.65rem; text-align: center;">60 min</td>
+                      <td style="padding: 0.65rem; text-align: center; color: #fbbf24; font-weight: 700;">926 kcal</td>
+                      <td style="padding: 0.65rem; text-align: center; color: #34d399;">811 kcal</td>
+                      <td style="padding: 0.65rem; text-align: center; color: #38bdf8;">+74 kcal (8%)</td>
+                      <td style="padding: 0.65rem; text-align: center;"><span class="badge-status success">Somado ao GET</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- TAB 7: NATIVE FOOD DATABASE (TACO UNICAMP / TBCA USP / USDA) -->
+        <section id="tab-tabela-nutricional" class="tab-panel">
+          <div class="card glass-card">
+            <div class="card-header flex-between">
+              <div>
+                <h3 class="card-title text-cyan"><i class="fa-solid fa-book-open-reader"></i> Base de Alimentos Nativa (TACO / TBCA / USDA)</h3>
+                <p class="card-subtitle">Consulta instantânea de nutrientes, gramagens, medidas caseiras e alimentos brasileiros</p>
+              </div>
+              <div class="flex-center gap-sm">
+                <button class="btn-secondary" onclick="triggerBarcodeScannerSim()"><i class="fa-solid fa-barcode"></i> Leitor Código de Barras</button>
+                <button class="btn-primary" onclick="showAddCustomFoodModal()"><i class="fa-solid fa-plus"></i> Novo Alimento</button>
+              </div>
+            </div>
+
+            <!-- CONTROLES DE BUSCA E FILTROS DE CATEGORIA -->
+            <div class="nutri-form-grid margin-top">
+              <div class="form-group col-span-8">
+                <label><i class="fa-solid fa-magnifying-glass"></i> Buscar por nome de alimento ou ingrediente</label>
+                <input type="text" id="taco-search-input" placeholder="Ex: Peito de frango, Aveia, Iogurte, Arroz, Ovos, Banana..." onkeyup="filterTacoFoodDatabaseUI()">
+              </div>
+              <div class="form-group col-span-4">
+                <label><i class="fa-solid fa-filter"></i> Categoria / Grupo Alimentar</label>
+                <select id="taco-category-filter" onchange="filterTacoFoodDatabaseUI()">
+                  <option value="TODAS">Todas as Categorias</option>
+                  <option value="Proteínas">Proteínas</option>
+                  <option value="Carboidratos">Carboidratos</option>
+                  <option value="Leguminosas">Leguminosas</option>
+                  <option value="Laticínios">Laticínios & Ovos</option>
+                  <option value="Gorduras">Gorduras & Oleaginosas</option>
+                  <option value="Frutas">Frutas</option>
+                  <option value="Vegetais">Vegetais & Verduras</option>
+                  <option value="Suplementos">Suplementos</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- TABELA DE ALIMENTOS RESULTADO DA BUSCA -->
+            <div class="margin-top" style="overflow-x: auto;">
+              <table class="history-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr style="background: rgba(30, 41, 59, 0.8);">
+                    <th style="padding: 0.75rem; text-align: left;">Alimento</th>
+                    <th style="padding: 0.75rem; text-align: center;">Categoria</th>
+                    <th style="padding: 0.75rem; text-align: center;">Porção Base</th>
+                    <th style="padding: 0.75rem; text-align: center;">Calorias (Kcal)</th>
+                    <th style="padding: 0.75rem; text-align: center;">Proteínas (g)</th>
+                    <th style="padding: 0.75rem; text-align: center;">Carbos (g)</th>
+                    <th style="padding: 0.75rem; text-align: center;">Gorduras (g)</th>
+                    <th style="padding: 0.75rem; text-align: center;">Fonte</th>
+                  </tr>
+                </thead>
+                <tbody id="taco-food-table-body">
+                  <!-- Dynamically rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 2: ANAMNESE CLÍNICA 360° & RASTREAMENTO METABÓLICO (NATIVO & PREENCHÍVEL) -->
+        <section id="tab-anamnese" class="tab-panel">
+          <div class="card glass-card">
+            <div class="card-header flex-between">
+              <div>
+                <h3 class="card-title text-purple"><i class="fa-solid fa-clipboard-question"></i> Anamnese Nativa 360° & Rastreamento Metabólico (MSQ / IFM)</h3>
+                <p class="card-subtitle">Ambiente completo de preenchimento e avaliação do histórico clínico, sintomas, sono e rastreamento metabólico</p>
+              </div>
+              <div class="flex-center gap-sm">
+                <button type="button" class="btn-secondary" onclick="exportAnamnese360PDF()"><i class="fa-solid fa-file-pdf"></i> Exportar Laudo PDF</button>
+                <button type="button" class="btn-primary" onclick="saveAnamnese360Form(event)"><i class="fa-solid fa-floppy-disk"></i> Salvar Anamnese 360°</button>
+              </div>
+            </div>
+
+            <!-- SCORE BANNER DO QUESTIONÁRIO MSQ -->
+            <div class="msq-banner-summary margin-top p-md" style="background: rgba(168, 85, 247, 0.15); border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.3); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="color: #cbd5e1; font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-heart-pulse text-purple"></i> Carga Tóxica & Hipersensibilidade (Score MSQ Atual):</span>
+                <h2 id="msq-total-score-val" style="color: #c084fc; margin: 0.2rem 0; font-size: 2.2rem;">18 <small style="font-size: 1rem; color: #34d399; font-weight: 600;">(Carga Baixa / Controlada)</small></h2>
+                <small style="color: #94a3b8;">Atualizado automaticamente conforme preenchimento dos sintomas abaixo</small>
+              </div>
+              <div class="badge-pill" style="background: rgba(168, 85, 247, 0.3); color: #e9d5ff; font-size: 0.85rem; padding: 0.5rem 1rem;">
+                <i class="fa-solid fa-shield-halved"></i> Matriz Medicina Funcional
+              </div>
+            </div>
+
+            <!-- SELETOR DE MODO E BARRA DE PROGRESSO DE PREENCHIMENTO DO PACIENTE -->
+            <div class="card glass-card margin-top" style="background: rgba(30, 41, 59, 0.7); border-left: 4px solid var(--purple);">
+              <div class="flex-between flex-wrap gap-sm">
+                <div>
+                  <h4 class="card-title text-purple" style="font-size: 1.05rem;"><i class="fa-solid fa-user-pen"></i> Módulo de Preenchimento da Anamnese pelo Paciente</h4>
+                  <p class="card-subtitle">Responda aos 7 blocos de perguntas sobre seu histórico de saúde, hábitos, digestão e sintomas</p>
+                </div>
+                <div class="flex-center gap-xs">
+                  <span class="badge-status success" id="anam360-status-badge"><i class="fa-solid fa-circle-check"></i> Anamnese Preenchida</span>
+                </div>
+              </div>
+
+              <!-- BARRA DE PROGRESSO DE RESPOSTAS -->
+              <div class="margin-top-sm p-xs" style="background: rgba(15, 23, 42, 0.5); border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #cbd5e1; margin-bottom: 0.3rem;">
+                  <span><i class="fa-solid fa-bars-progress text-purple"></i> Progresso das Respostas do Paciente:</span>
+                  <strong id="anam360-progress-text" style="color: #c084fc;">100% Concluído (7 de 7 blocos respondidos)</strong>
+                </div>
+                <div class="progress-bar-container" style="height: 8px;">
+                  <div id="anam360-progress-bar" class="progress-bar purple" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <form id="form-anamnese-360" onsubmit="saveAnamnese360Form(event)">
+              
+              <!-- SEÇÃO 1: HISTÓRICO CLÍNICO E ANTECEDENTES -->
+              <div class="card glass-card margin-top" style="background: rgba(15, 23, 42, 0.6);">
+                <h4 class="card-title text-purple" style="font-size: 1.05rem;"><i class="fa-solid fa-notes-medical"></i> 1. Histórico Clínico, Queixa Principal & Medicamentos</h4>
+                
+                <div class="nutri-form-grid margin-top">
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-solid fa-comment-dots"></i> Queixa Principal / Motivo da Consulta</label>
+                    <input type="text" id="anam360-queixa" value="Perda de peso sustentável, melhora da disposição e hipertrofia" placeholder="Ex: Cansaço frequente, estufamento abdominal, perda de peso">
+                  </div>
+
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-solid fa-pills"></i> Medicamentos de Uso Contínuo</label>
+                    <input type="text" id="anam360-medicamentos" value="Nenhum" placeholder="Ex: Puran T4 50mcg, Losartana 50mg, Omeprazol">
+                  </div>
+
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-solid fa-head-side-cough"></i> Alergias ou Intolerâncias Alimentares</label>
+                    <input type="text" id="anam360-alergias" value="Nenhuma relatada" placeholder="Ex: Intolerância à lactose, alergia a frutos do mar, sensibilidade ao glúten">
+                  </div>
+
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-solid fa-dna"></i> Histórico Familiar relevante</label>
+                    <input type="text" id="anam360-historico-fam" value="Diabetes Tipo 2 (Pai), Hipertensão (Mãe)" placeholder="Ex: Obesidade, Diabetes, Cardiopatias">
+                  </div>
+                </div>
+              </div>
+
+              <!-- SEÇÃO 2: ROTINA ESPORTIVA, PASSOS DIÁRIOS & CARDIO (ANAMNESE DE MOVIMENTO & NEAT) -->
+              <div class="card glass-card margin-top" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(16, 185, 129, 0.3);">
+                <div class="flex-between">
+                  <h4 class="card-title text-emerald" style="font-size: 1.05rem;"><i class="fa-solid fa-person-running"></i> 2. Rotina Esportiva, Passos Diários, Horários & Cardio (NEAT)</h4>
+                  <span class="badge-pill" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">Gasto Energético & Movimento</span>
+                </div>
+
+                <div class="nutri-form-grid margin-top">
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-clock"></i> Horário Habitual de Treino de Força</label>
+                    <input type="text" id="anam360-horario-treino" value="18:30 (Pós-trabalho)" placeholder="Ex: 06:00 Manhã em jejum, 18:00 Pós-trabalho">
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-dumbbell"></i> Tipo & Divisão de Treino de Força</label>
+                    <select id="anam360-tipo-treino">
+                      <option value="Musculação ABC (Foco Hipertrofia)" selected>Musculação ABC (Foco Hipertrofia)</option>
+                      <option value="Musculação Push / Pull / Legs">Musculação Push / Pull / Legs</option>
+                      <option value="Musculação Upper / Lower">Musculação Upper / Lower</option>
+                      <option value="Musculação Full Body">Musculação Full Body</option>
+                      <option value="Crossfit / Metcon">Crossfit / WOD Metcon</option>
+                      <option value="Calistenia / Peso Corporal">Calistenia / Peso Corporal</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-calendar-week"></i> Frequência Semanal de Musculação</label>
+                    <select id="anam360-freq-treino">
+                      <option value="3x por semana">3x por semana</option>
+                      <option value="4x por semana">4x por semana</option>
+                      <option value="5x por semana">5x por semana</option>
+                      <option value="6x por semana" selected>6x por semana (Intenso)</option>
+                      <option value="7x por semana">7x por semana</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-heart-pulse"></i> Modalidade / Tipo de Cardio</label>
+                    <select id="anam360-tipo-cardio">
+                      <option value="HIIT na Esteira (15-20 min)" selected>HIIT na Esteira (15-20 min)</option>
+                      <option value="Caminhada Moderada 6km/h">Caminhada Moderada 6km/h</option>
+                      <option value="Corrida Z2 8-10km/h">Corrida Z2 8-10km/h</option>
+                      <option value="Ciclismo / Spinning Indoor">Ciclismo / Spinning Indoor</option>
+                      <option value="Elíptico / Escada">Elíptico / Escada</option>
+                      <option value="Natação Crawl">Natação Crawl</option>
+                      <option value="Sem cardio na rotina">Sem cardio na rotina</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-stopwatch"></i> Duração & Frequência do Cardio</label>
+                    <select id="anam360-duracao-cardio">
+                      <option value="15 min - 4x por semana" selected>15 min — 4x por semana</option>
+                      <option value="30 min - 3x por semana">30 min — 3x por semana</option>
+                      <option value="45 min - 3x por semana">45 min — 3x por semana</option>
+                      <option value="60 min - 2x por semana">60 min — 2x por semana</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-business-time"></i> Horário Habitual do Cardio</label>
+                    <input type="text" id="anam360-horario-cardio" value="Pós-treino de musculação" placeholder="Ex: Manhã em jejum, Pós-treino, Fim de semana">
+                  </div>
+
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-solid fa-shoe-prints text-emerald"></i> Estimativa de Passos Diários (NEAT)</label>
+                    <select id="anam360-passos-diarios" onchange="updateNeatFromAnamnesePassos(this.value)">
+                      <option value="< 5.000 passos/dia (Sedentário)">&lt; 5.000 passos/dia (Sedentário)</option>
+                      <option value="5.000 a 7.499 passos/dia (Pouco ativo)" selected>5.000 a 7.499 passos/dia (Pouco ativo)</option>
+                      <option value="7.500 a 9.999 passos/dia (Moderadamente ativo)">7.500 a 9.999 passos/dia (Moderadamente ativo)</option>
+                      <option value="10.000 a 12.499 passos/dia (Ativo)">10.000 a 12.499 passos/dia (Ativo)</option>
+                      <option value="> 15.000 passos/dia (Muito ativo)">> 15.000 passos/dia (Muito ativo)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-solid fa-briefcase"></i> Ocupação & Rotina de Trabalho</label>
+                    <select id="anam360-trabalho-rotina">
+                      <option value="Sentado (Escritório / Home Office)" selected>Sentado (Escritório / Home Office)</option>
+                      <option value="Misto (Sentado e caminhadas curtas)">Misto (Sentado e caminhadas curtas)</option>
+                      <option value="Em pé a maior parte do tempo">Em pé a maior parte do tempo</option>
+                      <option value="Ativo em constante movimento">Ativo em constante movimento</option>
+                      <option value="Braçal / Esforço físico pesado">Braçal / Esforço físico pesado</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SEÇÃO 3: QUESTIONÁRIO DE RASTREAMENTO METABÓLICO MSQ (SINTOMAS NOS ÚLTIMOS 30 DIAS) -->
+              <div class="card glass-card margin-top" style="background: rgba(15, 23, 42, 0.6);">
+                <div class="flex-between">
+                  <h4 class="card-title text-purple" style="font-size: 1.05rem;"><i class="fa-solid fa-list-check"></i> 3. Rastreamento Metabólico MSQ (Sintomas por Sistema Corporall)</h4>
+                  <small style="color: #94a3b8;">Pontuação: 0=Nunca, 1=Raro, 2=Frequente, 3=Severo</small>
+                </div>
+
+                <div class="nutri-form-grid margin-top">
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-brain"></i> Dores de Cabeça / Enxaqueca</label>
+                    <select id="msq-item-cabeca" onchange="recalculateMsqScoreFromUI()">
+                      <option value="0" selected>0 - Nunca / Raramente</option>
+                      <option value="1">1 - Leve / Ocasional</option>
+                      <option value="2">2 - Frequente</option>
+                      <option value="3">3 - Severo / Frequente</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-eye"></i> Olheiras / Olhos Vermelhos</label>
+                    <select id="msq-item-olhos" onchange="recalculateMsqScoreFromUI()">
+                      <option value="0" selected>0 - Nunca</option>
+                      <option value="1">1 - Leve</option>
+                      <option value="2">2 - Moderado</option>
+                      <option value="3">3 - Intenso</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-head-side-virus"></i> Rinite / Congestão Nasal</label>
+                    <select id="msq-item-nariz" onchange="recalculateMsqScoreFromUI()">
+                      <option value="0">0 - Nunca</option>
+                      <option value="1" selected>1 - Raro</option>
+                      <option value="2">2 - Frequente</option>
+                      <option value="3">3 - Severo</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-heart-pulse"></i> Palpitações / Inchaço</label>
+                    <select id="msq-item-coracao" onchange="recalculateMsqScoreFromUI()">
+                      <option value="0" selected>0 - Nunca</option>
+                      <option value="1">1 - Leve</option>
+                      <option value="2">2 - Moderado</option>
+                      <option value="3">3 - Intenso</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-stomach"></i> Azia / Estufamento / Gases</label>
+                    <select id="msq-item-digestao" onchange="recalculateMsqScoreFromUI()">
+                      <option value="0">0 - Nunca</option>
+                      <option value="1" selected>1 - Leve</option>
+                      <option value="2">2 - Frequente</option>
+                      <option value="3">3 - Severo</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-bone"></i> Dores Articulares / Músculo</label>
+                    <select id="msq-item-articulacao" onchange="recalculateMsqScoreFromUI()">
+                      <option value="0" selected>0 - Nunca</option>
+                      <option value="1">1 - Ocasional</option>
+                      <option value="2">2 - Frequente</option>
+                      <option value="3">3 - Intenso</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-bolt"></i> Cansaço ao Acordar / Tarde</label>
+                    <select id="msq-item-energia" onchange="recalculateMsqScoreFromUI()">
+                      <option value="0">0 - Nunca</option>
+                      <option value="1" selected>1 - Ocasional</option>
+                      <option value="2">2 - Frequente</option>
+                      <option value="3">3 - Intenso</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-face-frown"></i> Ansiedade / Irritabilidade</label>
+                    <select id="msq-item-emocao" onchange="recalculateMsqScoreFromUI()">
+                      <option value="0">0 - Nunca</option>
+                      <option value="1" selected>1 - Leve</option>
+                      <option value="2">2 - Moderada</option>
+                      <option value="3">3 - Severa</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SEÇÃO 3: SAÚDE GASTROINTESTINAL & ESCALA DE BRISTOL -->
+              <div class="card glass-card margin-top" style="background: rgba(15, 23, 42, 0.6);">
+                <h4 class="card-title text-emerald" style="font-size: 1.05rem;"><i class="fa-solid fa-toilet-paper"></i> 3. Saúde Intestinal & Escala de Bristol</h4>
+
+                <div class="nutri-form-grid margin-top">
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-clock-rotate-left"></i> Frequência Evacuatória</label>
+                    <select id="anam360-freq-intestinal">
+                      <option value="Diária (1 a 2x por dia)" selected>Diária (1 a 2x por dia) — Ideal</option>
+                      <option value="Diária (3x ou mais)">Diária (3x ou mais)</option>
+                      <option value="A cada 2 dias">A cada 2 dias</option>
+                      <option value="Constipado (<3x por semana)">Constipado (<3x por semana)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-shapes"></i> Consistência (Escala de Bristol)</label>
+                    <select id="anam360-bristol-type">
+                      <option value="Tipo 3 ou 4 (Ideal / Salsicha macia)" selected>🟢 Tipo 3 ou 4 - Formato de salsicha macia (Ideal)</option>
+                      <option value="Tipo 1 ou 2 (Caroços duros / Constipação)">🔴 Tipo 1 ou 2 - Caroços duros / Cกระเป๋า (Constipação)</option>
+                      <option value="Tipo 5 ou 6 (Pedaços moles / Diarreico leve)">🟡 Tipo 5 ou 6 - Pedaços moles / Fezes pastosas</option>
+                      <option value="Tipo 7 (Totalmente líquido / Diarreia)">🔴 Tipo 7 - Totalmente líquido (Diarreia)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-wind"></i> Sintomas Digestivos Frequentes</label>
+                    <select id="anam360-sintomas-dig">
+                      <option value="Nenhum sintoma digestivo relevante" selected>Nenhum sintoma digestivo relevante</option>
+                      <option value="Estufamento pós-prandial">Estufamento pós-prandial</option>
+                      <option value="Gases excessivos / Odor forte">Gases excessivos / Odor forte</option>
+                      <option value="Refluxo / Azia frequente">Refluxo / Azia frequente</option>
+                      <option value="Dor abdominal / Cólicas">Dor abdominal / Cólicas</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SEÇÃO 4: SONO, ESTRESSE (PSS-10) & CRONOTIPO (MEQ) -->
+              <div class="card glass-card margin-top" style="background: rgba(15, 23, 42, 0.6);">
+                <h4 class="card-title text-indigo" style="font-size: 1.05rem;"><i class="fa-solid fa-moon"></i> 4. Sono, Estresse Percebido & Ritmo Circadiano</h4>
+
+                <div class="nutri-form-grid margin-top">
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-bed"></i> Horas Médias de Sono</label>
+                    <select id="anam360-sono-horas">
+                      <option value="< 5 horas">&lt; 5 horas/noite</option>
+                      <option value="5 a 6 horas">5 a 6 horas/noite</option>
+                      <option value="7 a 8 horas" selected>7 a 8 horas/noite (Ideal)</option>
+                      <option value="> 9 horas">&gt; 9 horas/noite</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-star"></i> Qualidade Percebida do Sono</label>
+                    <select id="anam360-sono-qualidade">
+                      <option value="Excelente (Acorda renovado)" selected>🟢 Excelente (Acorda renovado)</option>
+                      <option value="Boa (Poucos despertares)">🟢 Boa (Poucos despertares)</option>
+                      <option value="Regular (Leve cansaço)">🟡 Regular (Leve cansaço)</option>
+                      <option value="Ruim / Insônia frequente">🔴 Ruim / Insônia frequente</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-gauge-simple-high"></i> Nível de Estresse Percebido (PSS-10)</label>
+                    <select id="anam360-estresse-nivel">
+                      <option value="Baixo / Controlado" selected>🟢 Baixo / Controlado</option>
+                      <option value="Moderado (Trabalho/Rotina)">🟡 Moderado (Trabalho/Rotina)</option>
+                      <option value="Alto (Sensação de sobrecarga)">🔴 Alto (Sensação de sobrecarga)</option>
+                      <option value="Muito Alto / Burnout">🔴 Muito Alto / Extenuante</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-sun-plant-wilt"></i> Cronotipo (MEQ)</label>
+                    <select id="anam360-cronotipo">
+                      <option value="Matutino (Pico pela manhã)" selected>Matutino (Pico de energia pela manhã)</option>
+                      <option value="Intermediário (Equilibrado)">Intermediário (Equilibrado)</option>
+                      <option value="Vespertino (Pico à noite)">Vespertino (Pico de energia à noite)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SEÇÃO 5: MATRIZ DE MEDICINA FUNCIONAL IFM (7 NÓS METABÓLICOS) -->
+              <div class="card glass-card margin-top" style="background: rgba(15, 23, 42, 0.6);">
+                <div class="flex-between">
+                  <h4 class="card-title text-purple" style="font-size: 1.05rem;"><i class="fa-solid fa-network-wired"></i> 5. Matriz de Medicina Funcional (IFM - 7 Nós Metabólicos)</h4>
+                  <small style="color: #94a3b8;">Nível de comprometimento funcional (1 = Normal a 5 = Muito Alterado)</small>
+                </div>
+
+                <div class="nutri-form-grid margin-top">
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-stomach"></i> 1. Assimilação (Digestão/Absorção)</label>
+                    <select id="ifm-assimilacao">
+                      <option value="1" selected>1 - Equilibrada / Normal</option>
+                      <option value="2">2 - Leve estufamento pós-prandial</option>
+                      <option value="3">3 - Moderada disbiose / Azia</option>
+                      <option value="4">4 - Alta má absorção / Síndrome Intestinal</option>
+                      <option value="5">5 - Disfunção severa</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-shield-virus"></i> 2. Defesa & Reparação (Imunidade)</label>
+                    <select id="ifm-defesa">
+                      <option value="1" selected>1 - Imunidade Forte</option>
+                      <option value="2">2 - Infecções ocasionais</option>
+                      <option value="3">3 - Processos alérgicos frequentes</option>
+                      <option value="4">4 - Inflamação subclínica crônica</option>
+                      <option value="5">5 - Doença Autoimune diagnosticada</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-bolt-lightning"></i> 3. Energia (Mitocôndrias)</label>
+                    <select id="ifm-energia">
+                      <option value="1" selected>1 - Alta vitalidade e energia</option>
+                      <option value="2">2 - Queda de energia à tarde</option>
+                      <option value="3">3 - Cansaço matinal crônico</option>
+                      <option value="4">4 - Fadiga crônica acentuada</option>
+                      <option value="5">5 - Exaustão extrema / Mito-disfunção</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-3">
+                    <label><i class="fa-solid fa-filter"></i> 4. Biotransformação (Destoxificação)</label>
+                    <select id="ifm-destox">
+                      <option value="1" selected>1 - Destoxificação Hepática Eficiente</option>
+                      <option value="2">2 - Sensibilidade leve a álcool/remédios</option>
+                      <option value="3">3 - Carga tóxica moderada / Dores cabeça</option>
+                      <option value="4">4 - Alta sensibilidade química</option>
+                      <option value="5">5 - Sobrecarga hepática grave</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-comments text-amber"></i> 5. Comunicação (Hormônios & Sinalização)</label>
+                    <select id="ifm-comunicacao">
+                      <option value="1" selected>1 - Eixo Hormonal Equilibrado</option>
+                      <option value="2">2 - Resistência Insulínica Leve</option>
+                      <option value="3">3 - Cortisol Alterado / Disfunção de Adrenais</option>
+                      <option value="4">4 - Hipotireoidismo / SOP / TPM severa</option>
+                      <option value="5">5 - Múltiplas endocrinopatias</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-truck-medical text-red"></i> 6. Transporte (Cardiovascular/Linfático)</label>
+                    <select id="ifm-transporte">
+                      <option value="1" selected>1 - Pressão e Circulação Normais</option>
+                      <option value="2">2 - Leve retenção hídrica nas pernas</option>
+                      <option value="3">3 - Pré-hipertensão / Dislipidemia</option>
+                      <option value="4">4 - Hipertensão controlada por remédio</option>
+                      <option value="5">5 - Doença cardiovascular estabelecida</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-cubes-stacked text-cyan"></i> 7. Integridade Estrutural (Pele/Unhas/Articulações)</label>
+                    <select id="ifm-estrutura">
+                      <option value="1" selected>1 - Pele, cabelos, unhas e articulações saudáveis</option>
+                      <option value="2">2 - Unhas quebradiças ou queda leve de cabelo</option>
+                      <option value="3">3 - Dores articulares / Pele ressecada</option>
+                      <option value="4">4 - Perda acentuada de massa magra (Sarcopenia)</option>
+                      <option value="5">5 - Osteopenia / Lesões articulares crônicas</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SEÇÃO 6: COMPORTAMENTO ALIMENTAR, EAT-26 & GATILHOS EMOCIONAIS -->
+              <div class="card glass-card margin-top" style="background: rgba(15, 23, 42, 0.6);">
+                <h4 class="card-title text-pink-400" style="font-size: 1.05rem;"><i class="fa-solid fa-brain"></i> 6. Comportamento Alimentar, Fome Emocional & Triagem EAT-26</h4>
+
+                <div class="nutri-form-grid margin-top">
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-cookie-bite"></i> Compulsão por Doces / Carboidratos</label>
+                    <select id="anam360-compulsao-doces">
+                      <option value="Baixa (Sem episódios marcantes)" selected>Baixa (Sem episódios marcantes)</option>
+                      <option value="Moderada (Principalmente no fim da tarde)">Moderada (Principalmente no fim da tarde)</option>
+                      <option value="Alta (Compulsão noturna frequente)">Alta (Compulsão noturna frequente)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-face-grimace"></i> Fome Emocional (Estresse/Ansiedade)</label>
+                    <select id="anam360-fome-emocional">
+                      <option value="Baixa (Come apenas por fome física)" selected>Baixa (Come apenas por fome física)</option>
+                      <option value="Moderada (Busca conforto alimentar ocasional)">Moderada (Busca conforto alimentar ocasional)</option>
+                      <option value="Frequente (Ansiedade gera episódios hiperfágicos)">Frequente (Ansiedade gera episódios hiperfágicos)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-stopwatch"></i> Velocidade de Mastigação</label>
+                    <select id="anam360-mastigacao">
+                      <option value="Calma (>20 minutos por refeição)" selected>Calma (>20 minutos por refeição)</option>
+                      <option value="Moderada (10 a 20 minutos)">Moderada (10 a 20 minutos)</option>
+                      <option value="Rápida / Ansiosa (<10 minutos)">Rápida / Ansiosa (<10 minutos)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-solid fa-wine-glass-crack"></i> Consumo de Bebida Alcoólica</label>
+                    <input type="text" id="anam360-alcool" value="Raro (1x a 2x no mês em ocasiões sociais)" placeholder="Ex: 2 taças de vinho no fim de semana">
+                  </div>
+
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-solid fa-smoking"></i> Tabagismo / Vaping (Pod)</label>
+                    <input type="text" id="anam360-fumo" value="Não fumante" placeholder="Ex: Não fumante | Ex-fumante | 10 cigarros/dia">
+                  </div>
+                </div>
+              </div>
+
+              <!-- SEÇÃO 7: RECORDATÓRIO ALIMENTAR HABITUAL (R24H) -->
+              <div class="card glass-card margin-top" style="background: rgba(15, 23, 42, 0.6);">
+                <h4 class="card-title text-amber" style="font-size: 1.05rem;"><i class="fa-solid fa-clock-rotate-left"></i> 7. Recordatório Alimentar Habitual (R24h — Rotina Anterior)</h4>
+
+                <div class="nutri-form-grid margin-top">
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-mug-hot"></i> Café da Manhã Habitual</label>
+                    <textarea id="anam360-r24h-cafe" rows="2">Café com leite em pó, pão francês com ovo mexido ou queijo.</textarea>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-apple-whole"></i> Lanche da Manhã Habitual</label>
+                    <textarea id="anam360-r24h-lanche-m" rows="2">Iogurte natural com aveia em flocos ou dose de whey protein.</textarea>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-bowl-rice"></i> Almoço Habitual</label>
+                    <textarea id="anam360-r24h-almoco" rows="2">Arroz branco, feijão carioca, peito de frango grelhado e salada verde.</textarea>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-dumbbell"></i> Lanche da Tarde / Pré-Treino</label>
+                    <textarea id="anam360-r24h-pre" rows="2">Iogurte natural com aveia em flocos, leite em pó e banana.</textarea>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-utensils"></i> Jantar Habitual</label>
+                    <textarea id="anam360-r24h-jantar" rows="2">Prato similar ao almoço (frango, arroz, feijão) ou omelete reforçado.</textarea>
+                  </div>
+
+                  <div class="form-group col-span-4">
+                    <label><i class="fa-solid fa-moon"></i> Ceia Habitual</label>
+                    <textarea id="anam360-r24h-ceia" rows="2">Ceia leve com chá de camomila ou dose de proteína suplementar.</textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- BOTÕES DE AÇÃO -->
+              <div class="margin-top flex-end gap-sm p-sm">
+                <button type="button" class="btn-secondary" onclick="exportAnamnese360PDF()"><i class="fa-solid fa-file-pdf"></i> Exportar PDF</button>
+                <button type="submit" class="btn-primary" style="padding: 0.75rem 1.5rem;"><i class="fa-solid fa-floppy-disk"></i> Salvar Anamnese 360° no Sistema Nativo</button>
+              </div>
+
+            </form>
+          </div>
+        </section>
+
+        <!-- TAB 9: SUPLEMENTAÇÃO & FÓRMULAS MANIPULADAS NATIVAS -->
+        <section id="tab-suplementacao" class="tab-panel">
+          <div class="card glass-card">
+            <div class="card-header flex-between">
+              <div>
+                <h3 class="card-title text-amber"><i class="fa-solid fa-pills"></i> Prescrição de Suplementos & Fórmulas Manipuladas</h3>
+                <p class="card-subtitle">Protocolo de suplementação micronutricional, fitoterápica e ergogênica do paciente</p>
+              </div>
+              <button class="btn-primary" onclick="exportSupplementPrescriptionPDF()"><i class="fa-solid fa-file-pdf"></i> Exportar Receita PDF / WhatsApp</button>
+            </div>
+
+            <!-- GRADE DE SUPLEMENTOS PRESCRITOS -->
+            <div class="nutri-form-grid margin-top">
+              <div class="card glass-card col-span-6" style="background: rgba(15, 23, 42, 0.6);">
+                <h4 class="card-title text-amber" style="font-size: 1rem;"><i class="fa-solid fa-sun"></i> Ao Acordar / Manhã</h4>
+                <ul style="list-style: none; padding: 0; margin-top: 0.75rem; line-height: 1.8;">
+                  <li style="border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 0.4rem 0;">
+                    <strong>• Creatina Monohidratada 100% Pura:</strong> 5g com 300ml de água (Uso diário)
+                  </li>
+                  <li style="border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 0.4rem 0;">
+                    <strong>• Vitamina D3 + K2 (MK-7):</strong> 5.000 UI D3 + 100mcg K2 em gotas junto da refeição
+                  </li>
+                  <li style="padding: 0.4rem 0;">
+                    <strong>• Ômega 3 TG (Ultra Puro):</strong> 2 cápsulas (1.000mg EPA / 400mg DHA)
+                  </li>
+                </ul>
+              </div>
+
+              <div class="card glass-card col-span-6" style="background: rgba(15, 23, 42, 0.6);">
+                <h4 class="card-title text-purple" style="font-size: 1rem;"><i class="fa-solid fa-moon"></i> Antes de Dormir / Ceia</h4>
+                <ul style="list-style: none; padding: 0; margin-top: 0.75rem; line-height: 1.8;">
+                  <li style="border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 0.4rem 0;">
+                    <strong>• Bisglicinato de Magnésio:</strong> 350mg de magnésio elementar
+                  </li>
+                  <li style="border-bottom: 1px dashed rgba(255,255,255,0.1); padding: 0.4rem 0;">
+                    <strong>• Picolinato de Cromo:</strong> 250mcg (Modulação da sensibilidade à insulina)
+                  </li>
+                  <li style="padding: 0.4rem 0;">
+                    <strong>• Ashwagandha KSM-66:</strong> 400mg (Modulação de cortisol noturno)
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 10: MOTOR DE PRESCRIÇÃO NUTRICIONAL COM IA NATIVO -->
+        <section id="tab-motor-ia" class="tab-panel">
+          <div class="card glass-card" style="border: 1px solid rgba(59, 130, 246, 0.5);">
+            <div class="card-header flex-between">
+              <div>
+                <h3 class="card-title text-blue-400"><i class="fa-solid fa-wand-magic-sparkles"></i> Motor de Prescrição Nutricional com IA NutriAx Pro</h3>
+                <p class="card-subtitle">Geração de prescrição otimizada por perfil metabólico, anamnese, exames e composição corporal</p>
+              </div>
+              <span class="badge-pill" style="background: rgba(37, 99, 235, 0.3); color: #60a5fa; border: 1px solid rgba(37, 99, 235, 0.5);">
+                <i class="fa-solid fa-brain"></i> Algoritmo Inteligente NutriAx
+              </span>
+            </div>
+
+            <!-- CONTROLES DO MOTOR DE IA -->
+            <div class="nutri-form-grid margin-top">
+              <div class="form-group col-span-6">
+                <label><i class="fa-solid fa-sliders"></i> Selecionar Perfil Clínico / Esportivo Target</label>
+                <select id="ai-profile-target-select">
+                  <option value="emagrecimento" selected>🎯 Emagrecimento & Déficit Calórico Otimizado (-624 kcal)</option>
+                  <option value="hipertrofia">💪 Hipertrofia & Ganho Muscular Seco (+300 kcal)</option>
+                  <option value="recomposicao">🔄 Recomposição Corporal (Manutenção Isocalórica)</option>
+                  <option value="diabetes">🩸 Diabetes Tipo 2 / Resistência Insulínica (Baixo IG)</option>
+                  <option value="sop">🌺 Síndrome do Ovário Policístico (SOP) & Modulação Hormonal</option>
+                  <option value="fodmap">🌿 Síndrome do Intestino Irritável (Dieta Low-FODMAP)</option>
+                  <option value="hipotireoidismo">🦋 Hipotireoidismo / Hashimoto (Ajuste de Micronutrientes)</option>
+                  <option value="vegano">🌱 Vegetariano / Vegano Estruturado (Combinação Proteica)</option>
+                </select>
+              </div>
+
+              <div class="form-group col-span-6" style="display: flex; align-items: flex-end;">
+                <button type="button" class="btn-primary" onclick="generateAiPrescriptionDraft()" style="width: 100%; height: 42px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> Gerar Prescrição Inteligente com IA
+                </button>
+              </div>
+            </div>
+
+            <!-- CAIXA DE SAÍDA DA IA -->
+            <div id="ai-prescription-output-card" class="card glass-card margin-top" style="background: rgba(15, 23, 42, 0.8); border: 1px dashed rgba(96, 165, 250, 0.4); display: none;">
+              <h4 class="card-title text-blue-400"><i class="fa-solid fa-file-signature"></i> Rascunho Gerado pelo Motor IA NutriAx</h4>
+              <div id="ai-output-content" class="margin-top" style="line-height: 1.7; font-size: 0.95rem; color: #e2e8f0;">
+                <!-- Dynamically filled by JS -->
+              </div>
+              <div class="margin-top flex-end gap-sm">
+                <button class="btn-secondary" onclick="copyAiDraftToClipboard()"><i class="fa-solid fa-copy"></i> Copiar Texto</button>
+                <button class="btn-primary" onclick="applyAiDraftToActiveDiet()"><i class="fa-solid fa-check"></i> Aplicar Prescrição ao Paciente</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- FOOD SUBSTITUTION MODAL -->
+  <div class="modal-overlay" id="substitute-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-arrow-rotate-right"></i> Substituições de Alimentos</h3>
+        <button class="modal-close" onclick="closeSubstituteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Selecione a categoria do alimento que deseja substituir para ver as porções equivalentes recomendadas pela nutricionista:</p>
+        
+        <div class="form-group margin-top">
+          <label for="substitute-category">Categoria do Alimento</label>
+          <select id="substitute-category" onchange="renderSubstitutions()">
+            <option value="protein">Proteínas (Frango, Patinho, Peixe, Ovos)</option>
+            <option value="carbs">Carboidratos (Arroz, Batata, Mandioca, Aveia)</option>
+            <option value="fats">Gorduras Boas (Azeite, Castanhas, Abacate)</option>
+          </select>
+        </div>
+
+        <div class="substitutes-list-container" id="substitutes-output">
+          <!-- Dynamically filled by JavaScript -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeSubstituteModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
