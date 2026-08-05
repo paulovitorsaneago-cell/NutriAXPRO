@@ -5147,6 +5147,11 @@ window.showNutritionLabelModal = function(foodId) {
 // ==========================================================================
 // MODAL INTERATIVO DE SUBSTITUIÇÃO E INCLUSÃO DE ALIMENTOS DA BASE
 // ==========================================================================
+
+
+// ==========================================================================
+// MODAL INTERATIVO DE SUBSTITUIÇÃO E INCLUSÃO COM BUSCA E LISTA SUSPENSA
+// ==========================================================================
 window.openFoodSubstitutionModal = function(mealId, foodIndex = -1) {
   const targetList = (AppData.prescribedMeals && AppData.prescribedMeals.length > 0) ? AppData.prescribedMeals : AppData.meals;
   const meal = targetList.find(m => m.id === mealId);
@@ -5155,26 +5160,56 @@ window.openFoodSubstitutionModal = function(mealId, foodIndex = -1) {
   const currentFoods = meal.foods || meal.items || [];
   const foodToReplace = (foodIndex >= 0 && currentFoods[foodIndex]) ? currentFoods[foodIndex] : null;
 
-  const database = window.expandedTacoDatabase || [];
+  // Unify Database
+  if (!window.expandedTacoDatabase || window.expandedTacoDatabase.length === 0) {
+    window.expandedTacoDatabase = window.tacoFoodDatabase || [];
+  }
+  window.tacoFoodDatabase = window.expandedTacoDatabase;
 
-  // Group database foods by category
-  const categories = {};
-  database.forEach(item => {
-    const cat = item.category || 'Outros';
-    if (!categories[cat]) categories[cat] = [];
-    categories[cat].push(item);
-  });
+  const database = window.expandedTacoDatabase;
 
-  let selectOptionsHtml = Object.keys(categories).map(cat => {
-    const items = categories[cat].map(item => 
-      `<option value="${item.id}">${item.name} (${item.portion} - ${item.kcal} kcal, ${item.protein}g P, ${item.carbs}g C, ${item.fats}g G) [${item.source}]</option>`
-    ).join('');
-    return `<optgroup label="📂 ${cat}">${items}</optgroup>`;
-  }).join('');
+  // Build Options
+  window.renderSubstitutionModalSelectOptions = function(filterText = '') {
+    const select = document.getElementById('substitute-food-select');
+    if (!select) return;
+
+    const term = filterText.toLowerCase().trim();
+    let filtered = database;
+
+    if (term) {
+      filtered = database.filter(item => 
+        item.name.toLowerCase().includes(term) || 
+        (item.category && item.category.toLowerCase().includes(term)) ||
+        (item.source && item.source.toLowerCase().includes(term))
+      );
+    }
+
+    const categories = {};
+    filtered.forEach(item => {
+      const cat = item.category || 'Outros';
+      if (!categories[cat]) categories[cat] = [];
+      categories[cat].push(item);
+    });
+
+    if (Object.keys(categories).length === 0) {
+      select.innerHTML = '<option value="">Nenhum alimento encontrado com este filtro</option>';
+      return;
+    }
+
+    select.innerHTML = Object.keys(categories).map(cat => {
+      const items = categories[cat].map(item => 
+        `<option value="${item.id}">${item.name} (${item.portion} - ${item.kcal} kcal, ${item.protein}g P, ${item.carbs}g C, ${item.fats}g G) [${item.source}]</option>`
+      ).join('');
+      return `<optgroup label="📂 ${cat}">${items}</optgroup>`;
+    }).join('');
+
+    if (select.options.length > 0) select.selectedIndex = 0;
+    window.updateSubstituteModalMacroPreview();
+  };
 
   const modalHtml = `
-    <div id="food-substitution-modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 10000;" onclick="this.remove()">
-      <div class="card glass-card glow-purple" style="max-width: 520px; width: 92%; padding: 1.5rem; background: #0f172a; border: 1px solid rgba(168,85,247,0.4);" onclick="event.stopPropagation()">
+    <div id="food-substitution-modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.82); backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; z-index: 10000;" onclick="this.remove()">
+      <div class="card glass-card glow-purple" style="max-width: 550px; width: 94%; padding: 1.5rem; background: #0f172a; border: 1px solid rgba(168,85,247,0.4);" onclick="event.stopPropagation()">
         
         <div class="flex-between align-center margin-bottom-sm">
           <h3 style="color: #c084fc; font-size: 1.15rem; margin: 0; display: flex; align-items: center; gap: 8px;">
@@ -5185,16 +5220,21 @@ window.openFoodSubstitutionModal = function(mealId, foodIndex = -1) {
           </button>
         </div>
 
-        <p style="font-size: 0.8rem; color: #cbd5e1; margin-top: 0; margin-bottom: 1rem;">
+        <p style="font-size: 0.82rem; color: #cbd5e1; margin-top: 0; margin-bottom: 1rem;">
           Refeição: <strong style="color: #f8fafc;">${meal.title || meal.name}</strong> 
           ${foodToReplace ? `| Substituindo: <span class="badge-status warning">${foodToReplace.name}</span>` : ''}
         </p>
 
+        <!-- FILTRO DE BUSCA RÁPIDA DENTRO DO MODAL -->
+        <div class="form-group margin-bottom-sm">
+          <label style="color: #60a5fa; font-weight: 600; font-size: 0.8rem;"><i class="fa-solid fa-magnifying-glass"></i> Buscar Alimento na Lista (ex: Albumina, Pão, Bolo, YoPRO, Frango, Ovos)</label>
+          <input type="text" id="modal-search-filter" class="form-input-cyber" placeholder="Digite para filtrar instantaneamente..." style="width: 100%; background: #1e293b; color: #fff; padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(96,165,250,0.4);" onkeyup="window.renderSubstitutionModalSelectOptions(this.value)">
+        </div>
+
         <!-- SELECT LISTA SUSPENSA DE TODOS OS ALIMENTOS -->
         <div class="form-group margin-bottom">
-          <label style="color: #c084fc; font-weight: 600; font-size: 0.82rem;"><i class="fa-solid fa-list text-purple"></i> Selecione o Alimento da Base de Dados (TACO/TBCA/USDA/Rótulos)</label>
-          <select id="substitute-food-select" class="form-input-cyber" style="width: 100%; background: #1e293b; color: #fff; padding: 0.65rem; border-radius: 8px; border: 1px solid rgba(168,85,247,0.4);" onchange="window.updateSubstituteModalMacroPreview()">
-            ${selectOptionsHtml}
+          <label style="color: #c084fc; font-weight: 600; font-size: 0.82rem;"><i class="fa-solid fa-list text-purple"></i> Selecione o Alimento na Lista (120+ Alimentos Auditados)</label>
+          <select id="substitute-food-select" class="form-input-cyber" size="6" style="width: 100%; background: #1e293b; color: #fff; padding: 0.65rem; border-radius: 8px; border: 1px solid rgba(168,85,247,0.4);" onchange="window.updateSubstituteModalMacroPreview()">
           </select>
         </div>
 
@@ -5236,7 +5276,7 @@ window.openFoodSubstitutionModal = function(mealId, foodIndex = -1) {
   `;
 
   document.body.insertAdjacentHTML('beforeend', modalHtml);
-  window.updateSubstituteModalMacroPreview();
+  window.renderSubstitutionModalSelectOptions('');
 };
 
 window.updateSubstituteModalMacroPreview = function() {
