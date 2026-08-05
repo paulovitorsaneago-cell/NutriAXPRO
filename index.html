@@ -460,26 +460,50 @@
         <!-- TAB 2: PLANO ALIMENTAR (DIETA) -->
         <section id="tab-dieta" class="tab-panel">
           
-          <div class="section-intro-card card glass-card">
-            <div class="intro-content">
-              <h2><i class="fa-solid fa-utensils"></i> Prescrição Nutricional Personalizada</h2>
-              <p>Plano desenvolvido por Paulo Vitor Ribeiro de Sousa focado em recomposição e redução de cintura para Paulo Vitor.</p>
+          <!-- 1. RESUMO DA PRESCRIÇÃO NUTRICIONAL (FULL WIDTH CARD) -->
+          <div class="card glass-card margin-bottom" style="width: 100%;">
+            <div class="card-header flex-between align-center flex-wrap gap-sm">
+              <div>
+                <h2 style="font-size: 1.35rem; color: #f8fafc; font-weight: 700; margin: 0;">
+                  <i class="fa-solid fa-utensils text-emerald"></i> Prescrição Nutricional Personalizada
+                </h2>
+                <p style="font-size: 0.82rem; color: #cbd5e1; margin: 4px 0 0 0;">
+                  Plano nutricional de precisão focado em recomposição corporal e redução de cintura para Paulo Vitor.
+                </p>
+              </div>
+              <span class="badge-status success"><i class="fa-solid fa-circle-check"></i> Plano Ativo</span>
             </div>
-            <div class="diet-summary-pills">
-              <div class="pill-stat">
-                <small>Calorias Diárias</small>
-                <strong>2.840 kcal</strong>
+
+            <!-- MACRO SUMMARY 4-COLUMN GRID -->
+            <div class="nutri-form-grid margin-top-sm">
+              <div class="form-group col-span-3" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 0.85rem; text-align: center;">
+                <small style="color: #6ee7b7; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Calorias Diárias</small>
+                <h3 style="color: #10b981; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">2.840 <small style="font-size: 0.8rem;">kcal</small></h3>
+                <span style="font-size: 0.7rem; color: #94a3b8;">Déficit Orientado (TDEE: 3.464)</span>
               </div>
-              <div class="pill-stat">
-                <small>Proteínas</small>
-                <strong>190g (2.0g/kg MM)</strong>
+
+              <div class="form-group col-span-3" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 12px; padding: 0.85rem; text-align: center;">
+                <small style="color: #93c5fd; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Proteínas</small>
+                <h3 style="color: #3b82f6; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">190g</h3>
+                <span style="font-size: 0.7rem; color: #94a3b8;">2.0g/kg MM (760 kcal)</span>
               </div>
-              <div class="pill-stat">
-                <small>Carboidratos</small>
-                <strong>349g</strong>
+
+              <div class="form-group col-span-3" style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.25); border-radius: 12px; padding: 0.85rem; text-align: center;">
+                <small style="color: #67e8f9; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Carboidratos</small>
+                <h3 style="color: #06b6d4; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">349g</h3>
+                <span style="font-size: 0.7rem; color: #94a3b8;">3.6g/kg MM (1.396 kcal)</span>
               </div>
-          <!-- PAINEL DE IA E CONSTRUTOR DE REFEIÇÕES (NUTRICIONISTA) -->
-          <div class="ai-copilot-builder-box margin-bottom" id="nutri-diet-builder-toolbar">
+
+              <div class="form-group col-span-3" style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 12px; padding: 0.85rem; text-align: center;">
+                <small style="color: #e9d5ff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Gorduras</small>
+                <h3 style="color: #a855f7; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">76g</h3>
+                <span style="font-size: 0.7rem; color: #94a3b8;">0.65g/kg Peso (684 kcal)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. PAINEL COPILOTO IA & AÇÕES (FULL WIDTH CARD) -->
+          <div class="ai-copilot-builder-box margin-bottom" id="nutri-diet-builder-toolbar" style="width: 100%;">
             <div class="flex-between align-center flex-wrap gap-sm">
               <div>
                 <h4 style="color: #60a5fa; font-weight: 700; margin-bottom: 2px;"><i class="fa-solid fa-wand-magic-sparkles text-blue-400"></i> Copiloto de Prescrição Inteligente IA</h4>
@@ -496,9 +520,9 @@
             </div>
           </div>
 
-          <!-- PRESCRIÇÃO DO PROTOCOLO DE JEJUM INTERMITENTE (NUTRICIONISTA) -->
-          <div class="card glass-card margin-top margin-bottom" style="border-left: 4px solid #a855f7;">
-            <div class="card-header flex-between align-center">
+          <!-- 3. PRESCRIÇÃO DO PROTOCOLO DE JEJUM INTERMITENTE (FULL WIDTH CARD) -->
+          <div class="card glass-card margin-bottom" style="width: 100%; border-left: 4px solid #a855f7;">
+            <div class="card-header flex-between align-center flex-wrap gap-sm">
               <div>
                 <h3 class="card-title text-purple" style="color: #c084fc;"><i class="fa-solid fa-moon text-purple"></i> Protocolo de Jejum Intermitente Prescrito</h3>
                 <p class="card-subtitle">Parâmetros clínicos e horários da janela alimentar definidos pelo nutricionista</p>
@@ -538,8 +562,8 @@
             </div>
           </div>
 
-          <!-- REFEIÇÕES PRECRITAS ORGANIZADAS VERTICALMENTE ( LARGURA DA PÁGINA ) -->
-          <div class="meals-container meals-vertical-container" id="meals-list">
+          <!-- 4. REFEIÇÕES PRESCITAS ORGANIZADAS VERTICALMENTE EM LARGURA TOTAL -->
+          <div class="meals-container meals-vertical-container" id="meals-list" style="width: 100%;">
             <!-- Rendered dynamically by JavaScript -->
           </div>
 
