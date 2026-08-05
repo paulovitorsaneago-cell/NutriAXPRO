@@ -290,6 +290,47 @@
             </div>
           </div>
 
+          <!-- FASTING TIMER WIDGET (MODULO 5 & 1) -->
+          <div class="card glass-card fasting-timer-card margin-top margin-bottom">
+            <div class="card-header flex-between align-center">
+              <div>
+                <h3 class="card-title text-purple" style="color: #c084fc;"><i class="fa-solid fa-clock text-purple"></i> Cronômetro de Jejum Intermitente 360°</h3>
+                <p class="card-subtitle">Monitore sua janela de jejum e autofagia celular em tempo real sem penalidade na adesão alimentar</p>
+              </div>
+              <div id="fasting-status-badge">
+                <span class="badge-fasting-eating"><i class="fa-solid fa-utensils"></i> Janela Alimentar</span>
+              </div>
+            </div>
+
+            <div class="fasting-timer-wrapper margin-top-sm">
+              <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div class="form-group" style="margin: 0;">
+                  <label style="font-size: 0.75rem; color: #c084fc; font-weight: 600;"><i class="fa-solid fa-sliders"></i> Protocolo de Jejum</label>
+                  <select id="fasting-protocol-select" class="fasting-protocol-select" onchange="window.onFastingProtocolChanged(this.value)">
+                    <option value="12:12">12 / 12 Horas (Iniciante)</option>
+                    <option value="16:8" selected>16 / 8 Horas (Leangains - Recomendado)</option>
+                    <option value="18:6">18 / 6 Horas (Avançado)</option>
+                    <option value="20:4">20 / 4 Horas (Warrior Diet)</option>
+                    <option value="24:0">24 Horas (OMAD / Protocolo de 1 Dia)</option>
+                  </select>
+                </div>
+                <button type="button" id="btn-fasting-action" class="btn-fasting-toggle" onclick="window.toggleFastingState()">
+                  <i class="fa-solid fa-play"></i> <span>Iniciar Jejum</span>
+                </button>
+              </div>
+
+              <div class="fasting-clock-container">
+                <small style="font-size: 0.7rem; color: #a855f7; font-weight: 700; text-transform: uppercase;" id="fasting-clock-label">TEMPO DE JEJUM ATUAL</small>
+                <div class="fasting-clock-display" id="fasting-timer-display">00:00:00</div>
+                <small style="font-size: 0.7rem; color: #cbd5e1;" id="fasting-timer-subtext">Meta: 16 Horas de Jejum</small>
+              </div>
+            </div>
+
+            <div class="progress-bar-container margin-top-sm" style="height: 6px; background: rgba(255,255,255,0.06);">
+              <div class="progress-bar" id="fasting-progress-bar" style="width: 0%; background: linear-gradient(90deg, #a855f7, #3b82f6);"></div>
+            </div>
+          </div>
+
           <!-- MACRO DISTRIBUTION & WEIGHT EVOLUTION ROW -->
           <div class="dashboard-row">
             
@@ -665,6 +706,10 @@
                 <div class="quick-meals-grid" id="quick-meals-buttons">
                   <!-- Filled dynamically by JavaScript -->
                 </div>
+                <button type="button" class="btn-quick-fasting-window" onclick="window.logFastingWindowSlot()">
+                  <span><i class="fa-solid fa-moon" style="color: #c084fc;"></i> Registrar Janela de Jejum na Linha do Tempo</span>
+                  <span class="badge-status accent" style="font-size: 0.65rem; background: rgba(168,85,247,0.2); color: #f3e8ff;">Sem Penalidade</span>
+                </button>
               </div>
 
               <div class="form-divider">

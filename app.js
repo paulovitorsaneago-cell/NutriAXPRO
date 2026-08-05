@@ -3058,6 +3058,7 @@ function initApp() {
   try { calculateMetCaloricExpenditure(); } catch(e) { console.error("Error calculating METs:", e); }
   try { recalculateMsqScoreFromUI(); } catch(e) { console.error("Error recalculating MSQ score:", e); }
   try { initCharts(); } catch(e) { console.error("Error initializing charts:", e); }
+  try { FastingEngine.init(); } catch(e) { console.error("Error initializing FastingEngine:", e); }
 }
 
 if (document.readyState === 'loading') {
@@ -3066,3 +3067,205 @@ if (document.readyState === 'loading') {
   initApp();
 }
 
+
+
+// ==========================================================================
+// SPRINT 1: MOTOR DE JEJUM INTERMITENTE 360° & CRONÔMETRO NO DASHBOARD
+// ==========================================================================
+let fastingIntervalId = null;
+
+window.FastingEngine = {
+  STORAGE_KEY: 'nutriax_fasting_state',
+
+  getState: function() {
+    try {
+      const raw = localStorage.getItem(this.STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return {
+      isFasting: false,
+      startTime: null,
+      protocol: '16:8',
+      targetHours: 16
+    };
+  },
+
+  saveState: function(state) {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+    } catch(e) {
+      console.error("Error saving fasting state:", e);
+    }
+  },
+
+  init: function() {
+    const state = this.getState();
+    const select = document.getElementById('fasting-protocol-select');
+    if (select && state.protocol) {
+      select.value = state.protocol;
+    }
+    this.updateUI();
+
+    if (fastingIntervalId) clearInterval(fastingIntervalId);
+    fastingIntervalId = setInterval(() => {
+      this.updateTimerDisplay();
+    }, 1000);
+  },
+
+  getTargetHoursByProtocol: function(protocol) {
+    const parts = (protocol || '16:8').split(':');
+    return parseInt(parts[0], 10) || 16;
+  },
+
+  toggle: function() {
+    const state = this.getState();
+    const select = document.getElementById('fasting-protocol-select');
+    const protocol = select ? select.value : (state.protocol || '16:8');
+    const targetHours = this.getTargetHoursByProtocol(protocol);
+
+    if (state.isFasting) {
+      // End Fasting
+      const elapsedMs = Date.now() - new Date(state.startTime).getTime();
+      const elapsedHours = (elapsedMs / (1000 * 60 * 60)).toFixed(1);
+      
+      state.isFasting = false;
+      state.startTime = null;
+      this.saveState(state);
+      this.updateUI();
+
+      alert(`✅ Jejum de ${elapsedHours} horas finalizado com sucesso! Sua janela alimentar está aberta.`);
+    } else {
+      // Start Fasting
+      state.isFasting = true;
+      state.startTime = new Date().toISOString();
+      state.protocol = protocol;
+      state.targetHours = targetHours;
+      this.saveState(state);
+      this.updateUI();
+
+      alert(`🚀 Jejum Intermitente (${protocol}) iniciado! Monitore a contagem regressiva no seu Dashboard.`);
+    }
+  },
+
+  onProtocolChange: function(protocol) {
+    const state = this.getState();
+    state.protocol = protocol;
+    state.targetHours = this.getTargetHoursByProtocol(protocol);
+    this.saveState(state);
+    this.updateUI();
+  },
+
+  updateUI: function() {
+    const state = this.getState();
+    const btn = document.getElementById('btn-fasting-action');
+    const badge = document.getElementById('fasting-status-badge');
+    const subtext = document.getElementById('fasting-timer-subtext');
+    const clockLabel = document.getElementById('fasting-clock-label');
+
+    const targetH = state.targetHours || 16;
+
+    if (btn) {
+      if (state.isFasting) {
+        btn.className = 'btn-fasting-toggle btn-fasting-stop';
+        btn.innerHTML = `<i class="fa-solid fa-square"></i> <span>Finalizar Jejum</span>`;
+      } else {
+        btn.className = 'btn-fasting-toggle';
+        btn.innerHTML = `<i class="fa-solid fa-play"></i> <span>Iniciar Jejum</span>`;
+      }
+    }
+
+    if (badge) {
+      if (state.isFasting) {
+        badge.innerHTML = `<span class="badge-fasting-active"><i class="fa-solid fa-moon"></i> Em Jejum (${state.protocol || '16:8'})` + (state.startTime ? ` - Desde ${new Date(state.startTime).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</span>` : '</span>');
+      } else {
+        badge.innerHTML = `<span class="badge-fasting-eating"><i class="fa-solid fa-utensils"></i> Janela Alimentar Aberta</span>`;
+      }
+    }
+
+    if (subtext) {
+      subtext.innerText = `Meta: ${targetH} Horas de Jejum (${state.protocol || '16:8'})`;
+    }
+
+    if (clockLabel) {
+      clockLabel.innerText = state.isFasting ? 'TEMPO EM JEJUM (DECORRIDO)' : 'TEMPO EM JEJUM (PAUSADO)';
+    }
+
+    this.updateTimerDisplay();
+  },
+
+  updateTimerDisplay: function() {
+    const state = this.getState();
+    const display = document.getElementById('fasting-timer-display');
+    const progressBar = document.getElementById('fasting-progress-bar');
+    if (!display) return;
+
+    if (!state.isFasting || !state.startTime) {
+      display.innerText = '00:00:00';
+      if (progressBar) progressBar.style.width = '0%';
+      return;
+    }
+
+    const startMs = new Date(state.startTime).getTime();
+    const nowMs = Date.now();
+    const elapsedSec = Math.floor((nowMs - startMs) / 1000);
+
+    const hours = Math.floor(elapsedSec / 3600);
+    const minutes = Math.floor((elapsedSec % 3600) / 60);
+    const seconds = elapsedSec % 60;
+
+    const pad = n => String(n).padStart(2, '0');
+    display.innerText = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+
+    const targetSec = (state.targetHours || 16) * 3600;
+    const progressPct = Math.min(100, (elapsedSec / targetSec) * 100);
+
+    if (progressBar) {
+      progressBar.style.width = `${progressPct.toFixed(1)}%`;
+      if (progressPct >= 100) {
+        progressBar.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+      } else {
+        progressBar.style.background = 'linear-gradient(90deg, #a855f7, #3b82f6)';
+      }
+    }
+  }
+};
+
+window.toggleFastingState = function() {
+  window.FastingEngine.toggle();
+};
+
+window.onFastingProtocolChanged = function(protocol) {
+  window.FastingEngine.onProtocolChange(protocol);
+};
+
+window.logFastingWindowSlot = function() {
+  const selectedDate = document.getElementById('topbar-date-picker') ? document.getElementById('topbar-date-picker').value : new Date().toISOString().split('T')[0];
+  
+  if (!AppData.dailyLogs) AppData.dailyLogs = {};
+  if (!AppData.dailyLogs[selectedDate]) AppData.dailyLogs[selectedDate] = [];
+
+  const fastingItem = {
+    id: 'fast_' + Date.now(),
+    mealId: 'ref-fasting',
+    mealName: 'Janela de Jejum Intermitente',
+    foodId: 'fasting_slot',
+    name: '🌙 Janela de Jejum Intermitente (Autofagia Celular)',
+    qtyGrams: 0,
+    kcal: 0,
+    proteinG: 0,
+    carbsG: 0,
+    fatsG: 0,
+    status: 'fasting',
+    loggedAt: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    notes: 'Janela de Jejum cumprida conforme protocolo clínico (isento de penalidade de adesão).'
+  };
+
+  AppData.dailyLogs[selectedDate].push(fastingItem);
+  DatabaseEngine.save();
+
+  if (typeof renderDailyFoodLogUI === 'function') {
+    renderDailyFoodLogUI();
+  }
+
+  alert('✅ Janela de Jejum registrada no diário alimentar de hoje! A taxa de adesão alimentar foi mantida sem penalidade.');
+};
