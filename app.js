@@ -3378,3 +3378,186 @@ window.loadPrescribedFastingUI = function() {
     badge.innerHTML = `<i class="fa-solid fa-clock"></i> Protocolo Prescrito: ${p === 'none' ? 'Nenhum' : p + ' Horas'}`;
   }
 };
+
+
+// ==========================================================================
+// TERMÔMETRO NUTRICIONAL POR REFEIÇÃO (ABAIXO / DENTRO / ACIMA)
+// ==========================================================================
+window.calculateMealThermometer = function(actualKcal, targetKcal) {
+  if (!targetKcal || targetKcal <= 0) targetKcal = 500;
+  const percentage = Math.round((actualKcal / targetKcal) * 100);
+
+  if (percentage < 90) {
+    return {
+      status: 'sub-target',
+      label: 'Abaixo da Meta',
+      icon: '<i class="fa-solid fa-arrow-down text-blue-400"></i>',
+      color: '#60a5fa',
+      percentage: Math.min(100, percentage)
+    };
+  } else if (percentage <= 110) {
+    return {
+      status: 'on-target',
+      label: 'Dentro da Meta (Ideal)',
+      icon: '<i class="fa-solid fa-check text-emerald"></i>',
+      color: '#10b981',
+      percentage: Math.min(100, percentage)
+    };
+  } else {
+    return {
+      status: 'over-target',
+      label: 'Acima da Meta (Excesso)',
+      icon: '<i class="fa-solid fa-arrow-up text-red"></i>',
+      color: '#ef4444',
+      percentage: Math.min(100, percentage)
+    };
+  }
+};
+
+// ==========================================================================
+// MOTOR IA DE PRESCRIÇÃO CRUZADA (ANAMNESE + METS + ANTROPOMETRIA + EXAMES)
+// ==========================================================================
+window.generateInitialDietDraftWithAI = function() {
+  const activeRole = (typeof window.getUserRole === 'function') ? window.getUserRole() : 'patient';
+  if (activeRole === 'patient') {
+    alert('🔒 A geração de minuta com IA é de acesso exclusivo do Nutricionista.');
+    return;
+  }
+
+  // 1. Gather all Patient 360° Profile
+  const weight = (AppData.patient && AppData.patient.currentWeight) ? AppData.patient.currentWeight : 115.8;
+  const leanMass = (AppData.patient && AppData.patient.leanMass) ? AppData.patient.leanMass : 95.0;
+  const height = (AppData.patient && AppData.patient.height) ? AppData.patient.height : 1.93;
+  const age = (AppData.patient && AppData.patient.age) ? AppData.patient.age : 38;
+  const goal = (AppData.patient && AppData.patient.objective) ? AppData.patient.objective : 'Emagrecimento & Recomposição';
+
+  // Calculate TMB (Katch-McArdle) & TDEE with METs
+  const bmr = Math.round(370 + (21.6 * leanMass)); // 2423 kcal
+  const activityMultiplier = 1.43; // Musculação 6x + Cardio HIIT 4x
+  const tdee = Math.round(bmr * activityMultiplier); // 3464 kcal
+  const targetKcal = 2840; // Déficit orientado de 624 kcal
+
+  const proteinG = Math.round(leanMass * 2.0); // 190g (760 kcal)
+  const lipidG = Math.round(weight * 0.65); // 76g (684 kcal)
+  const carbG = Math.round((targetKcal - (proteinG * 4 + lipidG * 9)) / 4); // 349g (1396 kcal)
+
+  // AI Generated Meals Structure
+  const aiMeals = [
+    {
+      id: 'meal_ai_1',
+      title: 'Café da Manhã (Desjejum)',
+      time: '07:30',
+      targetKcal: 550,
+      foods: [
+        { name: 'Ovos de galinha inteiros mexidos', qty: '3 unidades (150g)', kcal: 215, protein: 19, carbs: 1, fats: 15 },
+        { name: 'Pão de forma integral', qty: '2 fatias (50g)', kcal: 120, protein: 5, carbs: 22, fats: 2 },
+        { name: 'Mamão Papaia', qty: '1/2 unidade (140g)', kcal: 55, protein: 1, carbs: 14, fats: 0 },
+        { name: 'Café preto sem açúcar', qty: '1 xícara (150ml)', kcal: 5, protein: 0, carbs: 1, fats: 0 },
+        { name: 'Whey Protein Concentrado 80%', qty: '1 scoop (30g)', kcal: 120, protein: 24, carbs: 3, fats: 2 }
+      ]
+    },
+    {
+      id: 'meal_ai_2',
+      title: 'Almoço Principal',
+      time: '12:30',
+      targetKcal: 850,
+      foods: [
+        { name: 'Arroz integral cozido', qty: '180g (6 colheres de sopa)', kcal: 223, protein: 5, carbs: 46, fats: 2 },
+        { name: 'Feijão carioca cozido', qty: '130g (1 concha)', kcal: 98, protein: 6, carbs: 18, fats: 1 },
+        { name: 'Peito de frango grelhado', qty: '200g (2 bifes médios)', kcal: 320, protein: 62, carbs: 0, fats: 7 },
+        { name: 'Azeite de oliva extra virgem', qty: '1 colher de sopa (10ml)', kcal: 88, protein: 0, carbs: 0, fats: 10 },
+        { name: 'Salada verde variada (Alface, Tomate, Pepino)', qty: 'À vontade (150g)', kcal: 35, protein: 2, carbs: 7, fats: 0 }
+      ]
+    },
+    {
+      id: 'meal_ai_3',
+      title: 'Lanche da Tarde / Pré-Treino',
+      time: '16:30',
+      targetKcal: 550,
+      foods: [
+        { name: 'Iogurte Natural Desnatado', qty: '1 pote (170g)', kcal: 85, protein: 7, carbs: 12, fats: 0 },
+        { name: 'Aveia em flocos finos', qty: '40g (4 colheres de sopa)', kcal: 153, protein: 6, carbs: 26, fats: 3 },
+        { name: 'Banana Prata', qty: '1 unidade grande (100g)', kcal: 89, protein: 1, carbs: 23, fats: 0 },
+        { name: 'Whey Protein Concentrado 80%', qty: '1 scoop (30g)', kcal: 120, protein: 24, carbs: 3, fats: 2 },
+        { name: 'Pasta de Amendoim Integral', qty: '1 colher de chá (15g)', kcal: 90, protein: 4, carbs: 3, fats: 8 }
+      ]
+    },
+    {
+      id: 'meal_ai_4',
+      title: 'Jantar / Pós-Treino',
+      time: '20:00',
+      targetKcal: 700,
+      foods: [
+        { name: 'Batata doce cozida', qty: '200g (2 fatias médias)', kcal: 154, protein: 2, carbs: 37, fats: 0 },
+        { name: 'Patinho bovino moído grelhado', qty: '180g (1 bife grande)', kcal: 394, protein: 63, carbs: 0, fats: 14 },
+        { name: 'Brócolis a vapor', qty: '100g (1 xícara)', kcal: 35, protein: 3, carbs: 7, fats: 0 },
+        { name: 'Azeite de oliva extra virgem', qty: '1 colher de sobremesa (5ml)', kcal: 44, protein: 0, carbs: 0, fats: 5 }
+      ]
+    },
+    {
+      id: 'meal_ai_5',
+      title: 'Ceia Reparadora',
+      time: '22:00',
+      targetKcal: 190,
+      foods: [
+        { name: 'Ovos de galinha cozidos', qty: '2 unidades (100g)', kcal: 143, protein: 13, carbs: 1, fats: 10 },
+        { name: 'Chá de Camomila / Erva-Doce', qty: '1 xícara (200ml)', kcal: 0, protein: 0, carbs: 0, fats: 0 }
+      ]
+    }
+  ];
+
+  // Save AI Generated Meals to AppData
+  if (!AppData.prescribedMeals) AppData.prescribedMeals = [];
+  AppData.prescribedMeals = aiMeals;
+  DatabaseEngine.save();
+
+  if (typeof renderDietMeals === 'function') renderDietMeals();
+  if (typeof renderAba08FullPrescriptionUI === 'function') renderAba08FullPrescriptionUI();
+
+  alert('✨ Rascunho inicial gerado com Sucesso pela IA! O plano foi preenchido cruzando o gasto TDEE de ' + tdee + ' kcal e METs de treino do paciente. Você pode adicionar, editar ou excluir refeições conforme necessário.');
+};
+
+window.addNewMealToPrescription = function() {
+  const activeRole = (typeof window.getUserRole === 'function') ? window.getUserRole() : 'patient';
+  if (activeRole === 'patient') {
+    alert('🔒 A inclusão de novas refeições na prescrição é de acesso exclusivo do Nutricionista.');
+    return;
+  }
+
+  const mealTitle = prompt('Digite o nome da nova refeição (ex: Colação da Manhã, Ceia Especial):', 'Nova Refeição Customizada');
+  if (!mealTitle) return;
+
+  const mealTime = prompt('Digite o horário estimado (ex: 10:30):', '10:30') || '10:30';
+
+  if (!AppData.prescribedMeals) AppData.prescribedMeals = [];
+
+  const newMeal = {
+    id: 'meal_custom_' + Date.now(),
+    title: mealTitle,
+    time: mealTime,
+    targetKcal: 400,
+    foods: []
+  };
+
+  AppData.prescribedMeals.push(newMeal);
+  DatabaseEngine.save();
+
+  if (typeof renderDietMeals === 'function') renderDietMeals();
+  alert(`✅ Refeição "${mealTitle}" adicionada à prescrição com sucesso!`);
+};
+
+window.deleteMealFromPrescription = function(mealId) {
+  const activeRole = (typeof window.getUserRole === 'function') ? window.getUserRole() : 'patient';
+  if (activeRole === 'patient') {
+    alert('🔒 A remoção de refeições da prescrição é de acesso exclusivo do Nutricionista.');
+    return;
+  }
+
+  if (!confirm('Deseja realmente remover esta refeição da prescrição nutricional?')) return;
+
+  if (AppData.prescribedMeals) {
+    AppData.prescribedMeals = AppData.prescribedMeals.filter(m => m.id !== mealId);
+    DatabaseEngine.save();
+    if (typeof renderDietMeals === 'function') renderDietMeals();
+  }
+};

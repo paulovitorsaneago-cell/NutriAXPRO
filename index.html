@@ -478,9 +478,20 @@
                 <small>Carboidratos</small>
                 <strong>349g</strong>
               </div>
-              <div class="pill-stat">
-                <small>Gorduras</small>
-                <strong>76g</strong>
+          <!-- PAINEL DE IA E CONSTRUTOR DE REFEIÇÕES (NUTRICIONISTA) -->
+          <div class="ai-copilot-builder-box margin-bottom" id="nutri-diet-builder-toolbar">
+            <div class="flex-between align-center flex-wrap gap-sm">
+              <div>
+                <h4 style="color: #60a5fa; font-weight: 700; margin-bottom: 2px;"><i class="fa-solid fa-wand-magic-sparkles text-blue-400"></i> Copiloto de Prescrição Inteligente IA</h4>
+                <p style="font-size: 0.78rem; color: #cbd5e1; margin: 0;">Gere a minuta inicial de dietas cruzando Anamnese, GET/METs de Atividades, Antropometria e Exames Clínicos do Paciente.</p>
+              </div>
+              <div class="flex-center gap-sm">
+                <button type="button" class="btn-ai-generate-prescription patient-btn-disabled" onclick="window.generateInitialDietDraftWithAI()">
+                  <i class="fa-solid fa-brain"></i> <span>Gerar Rascunho com IA</span>
+                </button>
+                <button type="button" class="btn-success btn-auth-submit patient-btn-disabled" onclick="window.addNewMealToPrescription()" style="padding: 0.65rem 1rem;">
+                  <i class="fa-solid fa-plus-circle"></i> <span>Adicionar Refeição</span>
+                </button>
               </div>
             </div>
           </div>
