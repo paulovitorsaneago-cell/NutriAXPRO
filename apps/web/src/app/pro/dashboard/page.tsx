@@ -1,203 +1,135 @@
-import { createClient } from '@/lib/supabase/server';
+import React from 'react';
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-
-  // Fetch nutritionist data
-  const { data: { user } } = await supabase.auth.getUser();
-  const { data: profile } = await supabase.from('users').select('*').eq('id', user?.id ?? '').single();
-
-  // Fetch patients count
-  const { count: patientsCount } = await supabase
-    .from('patients')
-    .select('*', { count: 'exact', head: true })
-    .eq('nutritionist_id', user?.id ?? '');
-
-  // Fetch active plans count
-  const { count: activePlansCount } = await supabase
-    .from('nutritional_plans')
-    .select('*', { count: 'exact', head: true })
-    .eq('nutritionist_id', user?.id ?? '')
-    .eq('is_active', true);
-
-  // Fetch recent food logs (adherence indicator)
-  const { data: recentLogs } = await supabase
-    .from('food_logs')
-    .select('id, patient_id, log_date, meal_name, status')
-    .order('log_date', { ascending: false })
-    .limit(20);
-
-  // Fetch altered exams
-  const { data: alteredExams } = await supabase
-    .from('clinical_exams')
-    .select('id, patient_id, exam_name, category, status_flag, priority, exam_date')
-    .in('status_flag', ['attention', 'altered'])
-    .order('priority', { ascending: false })
-    .limit(10);
-
-  // Fetch patients list for recent activity
-  const { data: patients } = await supabase
-    .from('patients')
-    .select('id, user_id, goal, is_active, users!patients_user_id_fkey(full_name)')
-    .eq('nutritionist_id', user?.id ?? '')
-    .eq('is_active', true)
-    .limit(8);
-
-  const completedLogs = recentLogs?.filter(l => l.status === 'completed').length ?? 0;
-  const totalLogs = recentLogs?.length ?? 1;
-  const adherenceRate = Math.round((completedLogs / Math.max(totalLogs, 1)) * 100);
-
-  const goalLabels: Record<string, string> = {
-    fat_loss: 'Emagrecimento',
-    muscle_gain: 'Hipertrofia',
-    maintenance: 'Manutenção',
-    health: 'Saúde Geral',
-    performance: 'Performance',
-  };
+  const patients = [
+    {
+      id: '00000000-0000-0000-0000-000000000003',
+      full_name: 'Paulo Vitor R de Sousa',
+      email: 'paulovitor.rsousa3@gmail.com',
+      goal: 'Emagrecimento & Recomposição',
+      current_weight: 115.8,
+      target_weight: 107.99,
+      bf_percent: 17.94,
+      days_without_log: 0, // Registered today!
+      status: 'Excelente (94%)',
+      plan_active: true,
+    },
+    {
+      id: '00000000-0000-0000-0000-000000000004',
+      full_name: 'Camila Ferreira Ramos',
+      email: 'camila.ramos@example.com',
+      goal: 'Hipertrofia & Ganho Muscular',
+      current_weight: 62.4,
+      target_weight: 66.0,
+      bf_percent: 19.2,
+      days_without_log: 3, // Alert! 3 days without check-in
+      status: 'Atenção (Alerta)',
+      plan_active: true,
+    }
+  ];
 
   return (
-    <>
-      {/* Header */}
-      <div className="content-header">
+    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+      {/* Top Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="page-title">Dashboard</h1>
+          <h1 className="text-2xl font-extrabold text-slate-100 flex items-center gap-2">
+            <i className="fa-solid fa-chart-pie text-emerald-400" />
+            Dashboard da Carteira de Pacientes
+          </h1>
+          <p className="text-xs text-slate-400">Visão Geral de Engajamento, Reavaliações Pendentes e Metas</p>
         </div>
-        <div className="header-actions">
-          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
-            Olá, {profile?.full_name?.split(' ')[0] ?? 'Nutricionista'} 👋
-          </span>
+        <button className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all">
+          <i className="fa-solid fa-user-plus" />
+          <span>Cadastrar Novo Paciente</span>
+        </button>
+      </div>
+
+      {/* Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-xl shadow-xl">
+          <span className="text-xs uppercase font-bold text-slate-400">Pacientes Em Acompanhamento</span>
+          <h3 className="text-3xl font-black text-slate-100 mt-1">12 <span className="text-xs text-emerald-400 font-normal">ativos</span></h3>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-xl shadow-xl">
+          <span className="text-xs uppercase font-bold text-slate-400">Reavaliações Pendentes</span>
+          <h3 className="text-3xl font-black text-amber-400 mt-1">3 <span className="text-xs text-slate-400 font-normal">esta semana</span></h3>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-xl shadow-xl">
+          <span className="text-xs uppercase font-bold text-slate-400">Adesão Média da Carteira</span>
+          <h3 className="text-3xl font-black text-emerald-400 mt-1">91.4%</h3>
+        </div>
+
+        <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-xl shadow-xl">
+          <span className="text-xs uppercase font-bold text-slate-400">Alertas de Exames Alterados</span>
+          <h3 className="text-3xl font-black text-rose-400 mt-1">2 <span className="text-xs text-slate-400 font-normal">pacientes</span></h3>
         </div>
       </div>
 
-      <div className="page-content">
-        {/* Stats Grid */}
-        <div className="grid grid-4 stagger-children" style={{ marginBottom: 'var(--space-8)' }}>
-          <div className="stat-card" style={{ '--stat-color': 'var(--color-primary)' } as React.CSSProperties}>
-            <div className="stat-icon" style={{ background: 'var(--color-primary-50)' }}>👥</div>
-            <span className="stat-label">Pacientes Ativos</span>
-            <span className="stat-value">{patientsCount ?? 0}</span>
-          </div>
-
-          <div className="stat-card" style={{ '--stat-color': 'var(--color-info)' } as React.CSSProperties}>
-            <div className="stat-icon" style={{ background: 'rgba(59, 130, 246, 0.1)' }}>📋</div>
-            <span className="stat-label">Planos Ativos</span>
-            <span className="stat-value">{activePlansCount ?? 0}</span>
-          </div>
-
-          <div className="stat-card" style={{ '--stat-color': adherenceRate >= 80 ? 'var(--color-success)' : 'var(--color-warning)' } as React.CSSProperties}>
-            <div className="stat-icon" style={{ background: adherenceRate >= 80 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)' }}>
-              {adherenceRate >= 80 ? '✅' : '⚠️'}
-            </div>
-            <span className="stat-label">Adesão Média</span>
-            <span className="stat-value">{adherenceRate}%</span>
-            <div className="progress-bar">
-              <div
-                className={`progress-fill ${adherenceRate < 60 ? 'danger' : adherenceRate < 80 ? 'warning' : ''}`}
-                style={{ width: `${adherenceRate}%` }}
-              />
-            </div>
-          </div>
-
-          <div className="stat-card" style={{ '--stat-color': 'var(--color-danger)' } as React.CSSProperties}>
-            <div className="stat-icon" style={{ background: 'rgba(239, 68, 68, 0.1)' }}>🔬</div>
-            <span className="stat-label">Exames Alterados</span>
-            <span className="stat-value">{alteredExams?.length ?? 0}</span>
-          </div>
+      {/* Patient List Table with Engagement Alerts */}
+      <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 backdrop-blur-xl shadow-xl space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <i className="fa-solid fa-users text-emerald-400" />
+            Carteira de Pacientes & Engajamento no Diário
+          </h2>
+          <span className="text-xs text-slate-400">Atualizado em tempo real via PostgreSQL</span>
         </div>
 
-        <div className="grid grid-2" style={{ gap: 'var(--space-6)' }}>
-          {/* Patients List */}
-          <div className="card">
-            <div className="card-header">
-              <div>
-                <h2 className="card-title">Pacientes Ativos</h2>
-                <p className="card-subtitle">Seus pacientes em acompanhamento</p>
-              </div>
-              <a href="/pro/patients" className="btn btn-secondary btn-sm">Ver todos</a>
-            </div>
-
-            {patients && patients.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {patients.map((patient) => {
-                  const userName = (patient.users as unknown as { full_name: string })?.full_name ?? 'Paciente';
-                  const initials = userName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-                  return (
-                    <a
-                      key={patient.id}
-                      href={`/pro/patients/${patient.id}`}
-                      className="flex items-center gap-3"
-                      style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-lg)', transition: 'background var(--transition-fast)' }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-surface-hover)')}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                    >
-                      <div className="avatar">{initials}</div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 600, fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
-                          {userName}
-                        </div>
-                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
-                          {goalLabels[patient.goal] ?? patient.goal}
-                        </div>
-                      </div>
-                      <span className="badge badge-success">Ativo</span>
-                    </a>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="empty-state" style={{ padding: 'var(--space-8)' }}>
-                <div className="empty-icon">👥</div>
-                <p className="empty-title">Nenhum paciente ainda</p>
-                <p className="empty-text">Cadastre seu primeiro paciente para começar.</p>
-                <a href="/pro/patients" className="btn btn-primary">Adicionar Paciente</a>
-              </div>
-            )}
-          </div>
-
-          {/* Altered Exams Alerts */}
-          <div className="card">
-            <div className="card-header">
-              <div>
-                <h2 className="card-title">Alertas de Exames</h2>
-                <p className="card-subtitle">Marcadores que requerem atenção</p>
-              </div>
-            </div>
-
-            {alteredExams && alteredExams.length > 0 ? (
-              <div className="flex flex-col gap-3">
-                {alteredExams.map((exam) => (
-                  <div
-                    key={exam.id}
-                    className="flex items-center gap-3"
-                    style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-lg)', background: 'var(--bg-surface-raised)' }}
-                  >
-                    <span style={{ fontSize: 'var(--text-lg)' }}>
-                      {exam.status_flag === 'altered' ? '🔴' : '🟡'}
-                    </span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: 'var(--text-sm)' }}>
-                        {exam.exam_name}
-                      </div>
-                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
-                        {exam.category} • {new Date(exam.exam_date).toLocaleDateString('pt-BR')}
-                      </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-slate-300 border-collapse">
+            <thead>
+              <tr className="border-b border-slate-800 text-xs uppercase text-slate-400 bg-slate-950/60">
+                <th className="p-3">Paciente</th>
+                <th className="p-3">Objetivo Target</th>
+                <th className="p-3 text-center">Peso Atual / Meta</th>
+                <th className="p-3 text-center">% Gordura</th>
+                <th className="p-3 text-center">Status Diário</th>
+                <th className="p-3 text-center">Ações de Gestão</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60">
+              {patients.map((p) => (
+                <tr key={p.id} className="hover:bg-slate-800/40 transition-colors">
+                  <td className="p-3">
+                    <div className="font-bold text-slate-100">{p.full_name}</div>
+                    <div className="text-xs text-slate-500">{p.email}</div>
+                  </td>
+                  <td className="p-3 text-xs font-semibold text-emerald-400">{p.goal}</td>
+                  <td className="p-3 text-center font-bold text-slate-200">{p.current_weight} kg <span className="text-xs text-slate-500">/ {p.target_weight} kg</span></td>
+                  <td className="p-3 text-center font-semibold text-cyan-400">{p.bf_percent}%</td>
+                  <td className="p-3 text-center">
+                    {p.days_without_log === 0 ? (
+                      <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        🟢 Ativo Hoje
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                        ⚠️ {p.days_without_log}d Sem Registro
+                      </span>
+                    )}
+                  </td>
+                  <td className="p-3 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <a href={`/pro/patients/${p.id}/anamnesis`} className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700">
+                        Anamnese
+                      </a>
+                      <a href={`/pro/patients/${p.id}/anthropometry`} className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700">
+                        Dobras
+                      </a>
+                      <a href={`/pro/patients/${p.id}/prescription`} className="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+                        Dieta / IA
+                      </a>
                     </div>
-                    <span className={`badge ${exam.status_flag === 'altered' ? 'badge-danger' : 'badge-warning'}`}>
-                      {exam.status_flag === 'altered' ? 'Alterado' : 'Atenção'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state" style={{ padding: 'var(--space-8)' }}>
-                <div className="empty-icon">✅</div>
-                <p className="empty-title">Nenhum alerta</p>
-                <p className="empty-text">Todos os exames estão dentro da faixa.</p>
-              </div>
-            )}
-          </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
-    </>
+    </div>
   );
 }

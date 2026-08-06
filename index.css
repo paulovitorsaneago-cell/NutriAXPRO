@@ -2553,6 +2553,22 @@ select {
   border-left: 4px solid #dc2626;
 }
 
+.nutri-tab-panel {
+  display: none !important;
+}
+
+.nutri-tab-panel.active {
+  display: block !important;
+}
+
+.perfil-section-panel {
+  display: none !important;
+}
+
+.perfil-section-panel.active {
+  display: block !important;
+}
+
 .nutri-subnav-tabs {
   display: flex;
   flex-wrap: wrap;

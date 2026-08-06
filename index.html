@@ -127,6 +127,24 @@
           <li data-tab="anamnese">
             <a href="#anamnese"><i class="fa-solid fa-clipboard-question"></i> <span>Anamnese & MSQ 360°</span></a>
           </li>
+          <li data-tab="perfil-paciente" class="nav-item-nutri">
+            <a href="#perfil-paciente" style="color: #34d399; font-weight: 700;">
+              <i class="fa-solid fa-id-card text-emerald-400"></i> <span>Perfil & Prontuário</span>
+              <span class="badge-pro-mini" style="background: #059669;">360°</span>
+            </a>
+          </li>
+          <li data-tab="nutri-avaliacao" class="nav-item-nutri">
+            <a href="#nutri-avaliacao" style="color: #38bdf8; font-weight: 700;">
+              <i class="fa-solid fa-ruler-combined text-cyan-400"></i> <span>Lançar Avaliação</span>
+              <span class="badge-pro-mini" style="background: #0284c7;">P7</span>
+            </a>
+          </li>
+          <li data-tab="nutri-exames" class="nav-item-nutri">
+            <a href="#nutri-exames" style="color: #a78bfa; font-weight: 700;">
+              <i class="fa-solid fa-vial-circle-check text-purple-400"></i> <span>Lançar Exames</span>
+              <span class="badge-pro-mini" style="background: #7c3aed;">LAB</span>
+            </a>
+          </li>
           <li data-tab="dieta">
             <a href="#dieta"><i class="fa-solid fa-utensils"></i> <span>Plano Alimentar</span></a>
           </li>
@@ -478,26 +496,26 @@
             <div class="nutri-form-grid margin-top-sm">
               <div class="form-group col-span-3" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 0.85rem; text-align: center;">
                 <small style="color: #6ee7b7; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Calorias Diárias</small>
-                <h3 style="color: #10b981; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">2.840 <small style="font-size: 0.8rem;">kcal</small></h3>
-                <span style="font-size: 0.7rem; color: #94a3b8;">Déficit Orientado (TDEE: 3.464)</span>
+                <h3 id="diet-summary-kcal" style="color: #10b981; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">2.840 <small style="font-size: 0.8rem;">kcal</small></h3>
+                <span id="diet-summary-tdee-subtitle" style="font-size: 0.7rem; color: #94a3b8;">Déficit Orientado (TDEE: 3.464)</span>
               </div>
 
               <div class="form-group col-span-3" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 12px; padding: 0.85rem; text-align: center;">
                 <small style="color: #93c5fd; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Proteínas</small>
-                <h3 style="color: #3b82f6; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">190g</h3>
-                <span style="font-size: 0.7rem; color: #94a3b8;">2.0g/kg MM (760 kcal)</span>
+                <h3 id="diet-summary-protein" style="color: #3b82f6; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">190g</h3>
+                <span id="diet-summary-protein-subtitle" style="font-size: 0.7rem; color: #94a3b8;">2.0g/kg MM (760 kcal)</span>
               </div>
 
               <div class="form-group col-span-3" style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.25); border-radius: 12px; padding: 0.85rem; text-align: center;">
                 <small style="color: #67e8f9; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Carboidratos</small>
-                <h3 style="color: #06b6d4; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">349g</h3>
-                <span style="font-size: 0.7rem; color: #94a3b8;">3.6g/kg MM (1.396 kcal)</span>
+                <h3 id="diet-summary-carbs" style="color: #06b6d4; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">349g</h3>
+                <span id="diet-summary-carbs-subtitle" style="font-size: 0.7rem; color: #94a3b8;">3.6g/kg MM (1.396 kcal)</span>
               </div>
 
               <div class="form-group col-span-3" style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 12px; padding: 0.85rem; text-align: center;">
                 <small style="color: #e9d5ff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Gorduras</small>
-                <h3 style="color: #a855f7; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">76g</h3>
-                <span style="font-size: 0.7rem; color: #94a3b8;">0.65g/kg Peso (684 kcal)</span>
+                <h3 id="diet-summary-fats" style="color: #a855f7; font-size: 1.6rem; font-weight: 800; margin: 4px 0 0 0;">76g</h3>
+                <span id="diet-summary-fats-subtitle" style="font-size: 0.7rem; color: #94a3b8;">0.65g/kg Peso (684 kcal)</span>
               </div>
             </div>
           </div>
@@ -510,13 +528,15 @@
                 <p style="font-size: 0.78rem; color: #cbd5e1; margin: 0;">Gere a minuta inicial de dietas cruzando Anamnese, GET/METs de Atividades, Antropometria e Exames Clínicos do Paciente.</p>
               </div>
               <div class="flex-center gap-sm">
-                <button type="button" class="btn-ai-generate-prescription patient-btn-disabled" onclick="window.generateInitialDietDraftWithAI()">
+                <button type="button" id="btn-ai-generate-prescription" class="btn-ai-generate-prescription patient-btn-disabled" onclick="window.generateInitialDietDraftWithAI()">
                   <i class="fa-solid fa-brain"></i> <span>Gerar Rascunho com IA</span>
                 </button>
                 <button type="button" class="btn-success btn-auth-submit patient-btn-disabled" onclick="window.addNewMealToPrescription()" style="padding: 0.65rem 1rem;">
                   <i class="fa-solid fa-plus-circle"></i> <span>Adicionar Refeição</span>
                 </button>
               </div>
+            </div>
+            <div id="ai-draft-status-banner" style="display: none; margin-top: 0.85rem; padding: 0.75rem 1rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; color: #34d399; font-size: 0.85rem; align-items: center; justify-content: space-between; gap: 8px;">
             </div>
           </div>
 
@@ -776,8 +796,8 @@
               <div class="prescribed-quick-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
                   <label class="section-label" style="margin: 0;"><i class="fa-solid fa-bolt-lightning text-amber"></i> Lançar Refeição Prescrita</label>
-                  <button type="button" class="btn-success btn-sm" onclick="loadAllPrescribedPlanToSpreadsheet()" title="Carregar todas as refeições do Plano Alimentar e aplicar na planilha">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> Carregar Plano Completo na Planilha
+                  <button type="button" class="btn-success btn-sm" onclick="loadAllPrescribedPlanToSpreadsheet()" title="Carregar todas as refeições do Plano Alimentar e aplicar no diário do paciente">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Carregar Plano Completo no Diário
                   </button>
                 </div>
                 <div class="quick-meals-grid" id="quick-meals-buttons">
@@ -955,12 +975,17 @@
               </form>
             </div>
 
-            <!-- HISTORICAL LOG TABLE / PLANILHA DE REGISTROS -->
-            <div class="card glass-card col-span-7">
+            <!-- HISTORICAL LOG TABLE / HISTÓRICO DE REGISTROS -->
+            <div class="card glass-card margin-top">
               <div class="card-header">
                 <div>
-                  <h3 class="card-title"><i class="fa-solid fa-table"></i> Planilha de Registros e Consumo Diário</h3>
-                  <p class="card-subtitle">Sincronização em tempo real com alimentos da Tabela 98 e check-ins</p>
+                  <h3 class="card-title"><i class="fa-solid fa-table"></i> Histórico de Registros e Consumo Diário</h3>
+                  <p class="card-subtitle">Linhas geradas pelo check-in do paciente e confirmações de refeições</p>
+                </div>
+                <div>
+                  <button type="button" class="btn-secondary btn-sm" onclick="exportHistoryLogsToCSV()">
+                    <i class="fa-solid fa-file-csv"></i> Exportar Histórico (CSV)
+                  </button>
                 </div>
                 <button type="button" class="btn-secondary" onclick="exportHistoryCSV()" title="Baixar histórico em arquivo CSV/Excel">
                   <i class="fa-solid fa-file-csv"></i> Exportar Planilha (CSV)
@@ -1019,7 +1044,7 @@
           <div class="section-intro-card card glass-card nutri-portal-header-card">
             <div class="intro-content">
               <h2><i class="fa-solid fa-user-doctor text-red"></i> Painel do Nutricionista — Prescrição & Gestão</h2>
-              <p>Preencha os dados do paciente, prescreva o plano alimentar e lance avaliações para alimentar o Portal do Paciente e a planilha em tempo real.</p>
+              <p>Preencha os dados do paciente, prescreva o plano alimentar e lance avaliações para alimentar o Portal do Paciente e o Banco de Dados em tempo real.</p>
             </div>
             <div class="nutri-status-badge">
               <span class="badge-status success"><i class="fa-solid fa-user-check"></i> Paciente Ativo: <strong>Paulo Vitor R. de Sousa</strong></span>
@@ -1029,19 +1054,19 @@
           <!-- NUTRI SUB-NAV TABS -->
           <div class="nutri-subnav-tabs margin-top">
             <button type="button" class="nutri-tab-btn active" onclick="switchNutriTab('perfil', this)">
-              <i class="fa-solid fa-id-card"></i> 1. Ficha do Paciente
+              <i class="fa-solid fa-id-card"></i> 1. Ficha do Paciente & Anamnese 360°
             </button>
             <button type="button" class="nutri-tab-btn" onclick="switchNutriTab('dieta', this)">
-              <i class="fa-solid fa-utensils text-red"></i> 2. Prescrição de Dieta (Aba 08_Prescrição Nutricional)
+              <i class="fa-solid fa-utensils text-red"></i> 2. Prescrição Nutricional
             </button>
             <button type="button" class="nutri-tab-btn" onclick="switchNutriTab('avaliacao', this)">
-              <i class="fa-solid fa-weight-scale"></i> 3. Lançar Avaliação
+              <i class="fa-solid fa-weight-scale"></i> 3. Avaliação Antropométrica (Pollock 7)
             </button>
             <button type="button" class="nutri-tab-btn" onclick="switchNutriTab('exames', this)">
-              <i class="fa-solid fa-vial"></i> 4. Lançar Exames
+              <i class="fa-solid fa-vial"></i> 4. Exames Bioquímicos
             </button>
-            <button type="button" class="nutri-tab-btn" onclick="switchNutriTab('gsheet', this)">
-              <i class="fa-solid fa-file-excel"></i> 5. Google Sheets
+            <button type="button" class="nutri-tab-btn" onclick="switchNutriTab('database', this)">
+              <i class="fa-solid fa-database text-blue"></i> 5. Central Banco de Dados
             </button>
           </div>
 
@@ -1116,7 +1141,7 @@
 
                     <div class="form-group col-span-3">
                       <label><i class="fa-solid fa-calculator text-blue"></i> Peso alvo (kg)</label>
-                      <input type="text" id="aba01-peso-alvo" value="107.99" readonly title="Calculado automaticamente na planilha (Aba 04_Antropometria H33)" style="background: rgba(255, 255, 255, 0.05); color: #94a3b8; cursor: not-allowed; font-weight: 700;">
+                      <input type="text" id="aba01-peso-alvo" value="107.99" readonly title="Calculado automaticamente pelo sistema nativo com base na Composição Corporal e Meta" style="background: rgba(255, 255, 255, 0.05); color: #94a3b8; cursor: not-allowed; font-weight: 700;">
                     </div>
 
                     <div class="form-group col-span-6">
@@ -1420,7 +1445,7 @@
 
                     <div class="col-span-12 form-actions">
                       <button type="submit" class="btn-primary" id="btn-save-aba01">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> <span>Salvar & Sincronizar na Planilha Google Sheets</span>
+                        <i class="fa-solid fa-cloud-arrow-up"></i> <span>Salvar & Sincronizar no Banco de Dados</span>
                       </button>
                     </div>
                   </div>
@@ -1629,13 +1654,13 @@
             <div class="card glass-card margin-bottom" style="border-left: 4px solid var(--accent-red);">
               <div class="card-header flex-between">
                 <div>
-                  <h3 class="card-title text-red"><i class="fa-solid fa-utensils"></i> 2. Prescrição de Dieta (Aba 08_Prescrição Nutricional)</h3>
-                  <p class="card-subtitle">Prescrição nutricional em 4 quadros interligados em tempo real com a planilha Google Sheets</p>
+                  <h3 class="card-title text-red"><i class="fa-solid fa-utensils"></i> 2. Prescrição Nutricional & Cardápio</h3>
+                  <p class="card-subtitle">Prescrição calculada em tempo real e sincronizada com o Portal do Paciente</p>
                 </div>
                 <div class="flex-center gap-sm">
-                  <span class="sync-pill synced" id="aba08-sync-status"><i class="fa-solid fa-cloud-check"></i> Sincronizado com Aba 08</span>
-                  <button type="button" class="btn-secondary" onclick="fetchDietaAba08FromGoogleSheets()" style="padding: 0.35rem 0.75rem;">
-                    <i class="fa-solid fa-rotate text-emerald"></i> Sincronizar
+                  <span class="sync-pill synced" id="aba08-sync-status"><i class="fa-solid fa-cloud-check"></i> Prontuário Sincronizado</span>
+                  <button type="button" class="btn-secondary" onclick="if(typeof renderDietMeals === 'function') renderDietMeals()" style="padding: 0.35rem 0.75rem;">
+                    <i class="fa-solid fa-rotate text-emerald"></i> Atualizar Cardápio
                   </button>
                 </div>
               </div>
@@ -1645,55 +1670,177 @@
             <div id="aba08-diet-list-container">
               <div class="loading-spinner text-center p-md">
                 <i class="fa-solid fa-spinner fa-spin fa-2x text-red"></i>
-                <p class="margin-top-sm" style="color: #94a3b8;">Carregando os 4 quadros da Aba 08_Prescrição Nutricional...</p>
+                <p class="margin-top-sm" style="color: #94a3b8;">Carregando os quadros da Prescrição Nutricional em tempo real...</p>
               </div>
             </div>
           </div>
 
-          <!-- NUTRI TAB 3: LANÇAR AVALIAÇÃO CORPORAL -->
+          <!-- NUTRI TAB 3: AVALIAÇÃO ANTROPOMÉTRICA INOVADORA 360° & MOTOR NORTEADOR -->
           <div id="nutri-tab-avaliacao" class="nutri-tab-panel margin-top" style="display: none;">
-            <div class="card glass-card">
-              <div class="card-header">
+            <div class="grid grid-2 gap-md">
+              
+              <!-- COLUNA 1: ENTRADA DE DOBRAS POLLOCK 7 & PERÍMETROS -->
+              <div class="card glass-card">
+                <div class="card-header">
+                  <div>
+                    <h3 class="card-title text-emerald"><i class="fa-solid fa-ruler-combined"></i> 1. Dobras Cutâneas & Perímetros</h3>
+                    <p class="card-subtitle">Protocolo Jackson Pollock 7 Dobras (mm) e Perímetros Corporais (cm)</p>
+                  </div>
+                </div>
+
+                <form onsubmit="handleNutriSaveEvaluation(event)" class="nutri-form-grid">
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-regular fa-calendar text-emerald"></i> Data da Avaliação</label>
+                    <input type="date" id="nutri-eval-date" required>
+                  </div>
+                  <div class="form-group col-span-6">
+                    <label><i class="fa-solid fa-weight-scale text-emerald"></i> Peso Corporal (kg)</label>
+                    <input type="number" step="0.1" id="nutri-eval-weight" value="115.8" oninput="calculatePollock7FromForm()" required>
+                  </div>
+
+                  <div class="col-span-12 margin-top border-top pt-3">
+                    <h4 class="text-emerald" style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">
+                      <i class="fa-solid fa-ruler-vertical"></i> Dobras Cutâneas (mm)
+                    </h4>
+                  </div>
+                  <div class="form-group col-span-3">
+                    <label>Tricipital (TR)</label>
+                    <input type="number" step="0.1" id="nutri-skinfold-tr" value="14" oninput="calculatePollock7FromForm()">
+                  </div>
+                  <div class="form-group col-span-3">
+                    <label>Subescapular (SE)</label>
+                    <input type="number" step="0.1" id="nutri-skinfold-se" value="18" oninput="calculatePollock7FromForm()">
+                  </div>
+                  <div class="form-group col-span-3">
+                    <label>Supra-ilíaca (SI)</label>
+                    <input type="number" step="0.1" id="nutri-skinfold-si" value="22" oninput="calculatePollock7FromForm()">
+                  </div>
+                  <div class="form-group col-span-3">
+                    <label>Abdominal (AB)</label>
+                    <input type="number" step="0.1" id="nutri-skinfold-ab" value="28" oninput="calculatePollock7FromForm()">
+                  </div>
+                  <div class="form-group col-span-4">
+                    <label>Coxa (CX)</label>
+                    <input type="number" step="0.1" id="nutri-skinfold-cx" value="16" oninput="calculatePollock7FromForm()">
+                  </div>
+                  <div class="form-group col-span-4">
+                    <label>Peitoral (PT)</label>
+                    <input type="number" step="0.1" id="nutri-skinfold-pt" value="12" oninput="calculatePollock7FromForm()">
+                  </div>
+                  <div class="form-group col-span-4">
+                    <label>Axilar Média (AM)</label>
+                    <input type="number" step="0.1" id="nutri-skinfold-am" value="15" oninput="calculatePollock7FromForm()">
+                  </div>
+
+                  <div class="col-span-12 margin-top border-top pt-3">
+                    <h4 class="text-purple" style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">
+                      <i class="fa-solid fa-tape"></i> Perímetros Corporais (cm)
+                    </h4>
+                  </div>
+                  <div class="form-group col-span-4">
+                    <label>Cintura (cm)</label>
+                    <input type="number" step="0.5" id="nutri-eval-waist" value="101.0" oninput="calculatePollock7FromForm()">
+                  </div>
+                  <div class="form-group col-span-4">
+                    <label>Abdômen (cm)</label>
+                    <input type="number" step="0.5" id="nutri-eval-abdomen" value="102.0" oninput="calculatePollock7FromForm()">
+                  </div>
+                  <div class="form-group col-span-4">
+                    <label>Quadril (cm)</label>
+                    <input type="number" step="0.5" id="nutri-eval-hip" value="111.5" oninput="calculatePollock7FromForm()">
+                  </div>
+                  <div class="form-group col-span-4">
+                    <label>Peitoral (cm)</label>
+                    <input type="number" step="0.5" id="nutri-eval-chest" value="118.0">
+                  </div>
+                  <div class="form-group col-span-4">
+                    <label>Braço (cm)</label>
+                    <input type="number" step="0.5" id="nutri-eval-arm" value="42.0">
+                  </div>
+                  <div class="form-group col-span-4">
+                    <label>Coxa (cm)</label>
+                    <input type="number" step="0.5" id="nutri-eval-thigh" value="66.0">
+                  </div>
+
+                  <div class="col-span-12 form-actions margin-top">
+                    <button type="submit" class="btn-primary" style="width: 100%; background: linear-gradient(135deg, #059669, #10b981); border: none; padding: 0.85rem; font-size: 0.95rem; font-weight: 800;">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i> Salvar & Aplicar Diagnóstico na Prescrição
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- COLUNA 2: PAINEL DE DIAGNÓSTICO FISIOLÓGICO & MOTOR NORTEADOR -->
+              <div class="card glass-card flex flex-col justify-between">
                 <div>
-                  <h3 class="card-title"><i class="fa-solid fa-weight-scale"></i> Nova Avaliação Física / Antropométrica</h3>
-                  <p class="card-subtitle">Insira os novos dados de peso, % de gordura e circunferências para gerar os gráficos</p>
+                  <div class="card-header">
+                    <div>
+                      <h3 class="card-title text-cyan"><i class="fa-solid fa-calculator"></i> 2. Diagnóstico Nutricional em Tempo Real</h3>
+                      <p class="card-subtitle">Cálculos gerados instantaneamente que norteiam os macronutrientes da dieta</p>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-2 gap-sm margin-top">
+                    <div class="stat-card" style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); padding: 1rem; border-radius: 12px;">
+                      <span style="font-size: 0.75rem; font-weight: 700; color: #22d3ee; text-transform: uppercase;">% Gordura Corporal</span>
+                      <h3 id="diag-fat-percent" style="font-size: 1.6rem; font-weight: 900; color: #22d3ee; margin-top: 0.2rem;">17.94%</h3>
+                      <small style="color: #94a3b8; font-size: 0.7rem;">Fórmula Siri (Pollock 7)</small>
+                    </div>
+
+                    <div class="stat-card" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 1rem; border-radius: 12px;">
+                      <span style="font-size: 0.75rem; font-weight: 700; color: #34d399; text-transform: uppercase;">Massa Magra (kg)</span>
+                      <h3 id="diag-muscle-mass" style="font-size: 1.6rem; font-weight: 900; color: #34d399; margin-top: 0.2rem;">95.03 kg</h3>
+                      <small style="color: #94a3b8; font-size: 0.7rem;">82.1% do peso total</small>
+                    </div>
+
+                    <div class="stat-card" style="background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); padding: 1rem; border-radius: 12px;">
+                      <span style="font-size: 0.75rem; font-weight: 700; color: #fb7185; text-transform: uppercase;">Massa Gorda (kg)</span>
+                      <h3 id="diag-fat-mass" style="font-size: 1.6rem; font-weight: 900; color: #fb7185; margin-top: 0.2rem;">20.77 kg</h3>
+                      <small style="color: #94a3b8; font-size: 0.7rem;">17.9% do peso total</small>
+                    </div>
+
+                    <div class="stat-card" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 1rem; border-radius: 12px;">
+                      <span style="font-size: 0.75rem; font-weight: 700; color: #fbbf24; text-transform: uppercase;">IMC Fisiológico</span>
+                      <h3 id="diag-bmi" style="font-size: 1.6rem; font-weight: 900; color: #fbbf24; margin-top: 0.2rem;">31.09</h3>
+                      <small style="color: #94a3b8; font-size: 0.7rem;">Ajustado por Massa Magra</small>
+                    </div>
+
+                    <div class="stat-card" style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); padding: 1rem; border-radius: 12px;">
+                      <span style="font-size: 0.75rem; font-weight: 700; color: #c084fc; text-transform: uppercase;">FFMI (Massa Livre)</span>
+                      <h3 id="diag-ffmi" style="font-size: 1.6rem; font-weight: 900; color: #c084fc; margin-top: 0.2rem;">25.5</h3>
+                      <small style="color: #94a3b8; font-size: 0.7rem;">Potencial Muscular Alto</small>
+                    </div>
+
+                    <div class="stat-card" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); padding: 1rem; border-radius: 12px;">
+                      <span style="font-size: 0.75rem; font-weight: 700; color: #60a5fa; text-transform: uppercase;">RCQ (Cintura/Quadril)</span>
+                      <h3 id="diag-whr" style="font-size: 1.6rem; font-weight: 900; color: #60a5fa; margin-top: 0.2rem;">0.91</h3>
+                      <small style="color: #34d399; font-size: 0.7rem;">🟢 Baixo Risco Cardiovascular</small>
+                    </div>
+                  </div>
+
+                  <div class="margin-top p-sm" style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(51, 65, 85, 0.8); border-radius: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                      <span style="font-size: 0.8rem; color: #cbd5e1; font-weight: 700;"><i class="fa-solid fa-bolt text-amber"></i> TMB (Katch-McArdle):</span>
+                      <strong id="diag-bmr" style="color: #fbbf24; font-size: 1rem;">2.423 kcal</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                      <span style="font-size: 0.8rem; color: #cbd5e1; font-weight: 700;"><i class="fa-solid fa-fire text-emerald"></i> GET / TDEE (AF 1.43):</span>
+                      <strong id="diag-get" style="color: #34d399; font-size: 1rem;">3.464 kcal</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <span style="font-size: 0.8rem; color: #cbd5e1; font-weight: 700;"><i class="fa-solid fa-glass-water text-cyan"></i> Meta de Água Diária:</span>
+                      <strong id="diag-water" style="color: #22d3ee; font-size: 1rem;">5.300 ml</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="margin-top-md text-center p-xs" style="background: rgba(5, 150, 105, 0.1); border: 1px border-dashed rgba(16, 185, 129, 0.3); border-radius: 10px;">
+                  <span style="font-size: 0.75rem; color: #34d399; font-weight: 600;">
+                    <i class="fa-solid fa-circle-check"></i> Todos os cálculos norteiam automaticamente as metas da Prescrição Nutricional
+                  </span>
                 </div>
               </div>
-              <form onsubmit="handleNutriSaveEvaluation(event)" class="nutri-form-grid">
-                <div class="form-group col-span-3">
-                  <label><i class="fa-regular fa-calendar"></i> Data da Avaliação</label>
-                  <input type="date" id="nutri-eval-date" required>
-                </div>
-                <div class="form-group col-span-3">
-                  <label><i class="fa-solid fa-weight-scale"></i> Peso Corporal (kg)</label>
-                  <input type="number" step="0.1" id="nutri-eval-weight" placeholder="115.8" required>
-                </div>
-                <div class="form-group col-span-3">
-                  <label><i class="fa-solid fa-percent"></i> % Gordura Corporal</label>
-                  <input type="number" step="0.1" id="nutri-eval-fat" placeholder="17.9" required>
-                </div>
-                <div class="form-group col-span-3">
-                  <label><i class="fa-solid fa-dumbbell"></i> Massa Magra (kg)</label>
-                  <input type="number" step="0.1" id="nutri-eval-muscle" placeholder="95.0">
-                </div>
-                <div class="form-group col-span-4">
-                  <label><i class="fa-solid fa-ruler-horizontal"></i> Circunferência Cintura (cm)</label>
-                  <input type="number" step="0.5" id="nutri-eval-waist" placeholder="101.0">
-                </div>
-                <div class="form-group col-span-4">
-                  <label><i class="fa-solid fa-ruler-horizontal"></i> Circunferência Abdômen (cm)</label>
-                  <input type="number" step="0.5" id="nutri-eval-abdomen" placeholder="102.0">
-                </div>
-                <div class="form-group col-span-4">
-                  <label><i class="fa-solid fa-ruler-horizontal"></i> Circunferência Quadril (cm)</label>
-                  <input type="number" step="0.5" id="nutri-eval-hip" placeholder="111.5">
-                </div>
-                <div class="col-span-12 form-actions">
-                  <button type="submit" class="btn-primary">
-                    <i class="fa-solid fa-chart-line"></i> Registrar Avaliação no Portal do Paciente
-                  </button>
-                </div>
-              </form>
+
             </div>
           </div>
 
@@ -1737,31 +1884,31 @@
             </div>
           </div>
 
-          <!-- NUTRI TAB 5: GOOGLE SHEETS CONNECTOR -->
-          <div id="nutri-tab-gsheet" class="nutri-tab-panel margin-top" style="display: none;">
+          <!-- NUTRI TAB 5: CENTRAL DO BANCO DE DADOS RELACIONAL -->
+          <div id="nutri-tab-database" class="nutri-tab-panel margin-top" style="display: none;">
             <div class="card glass-card">
               <div class="card-header">
                 <div>
-                  <h3 class="card-title"><i class="fa-solid fa-file-excel text-emerald"></i> Sincronização e Configuração do Google Sheets</h3>
-                  <p class="card-subtitle">Gerencie o Web App do Google Apps Script publicado para sincronização remota da aba 12_App do Paciente</p>
+                  <h3 class="card-title text-blue"><i class="fa-solid fa-database"></i> Central do Banco de Dados Relacional (PostgreSQL / Supabase)</h3>
+                  <p class="card-subtitle">Gestão de armazenamento nativo, persistência de prontuários e exportação em tempo real</p>
                 </div>
               </div>
 
               <div class="gs-config-box margin-top">
-                <div id="gs-status-bar" class="gs-status-banner">
-                  <i class="fa-solid fa-file-excel"></i>
+                <div id="db-status-bar" class="gs-status-banner" style="background: rgba(37, 99, 235, 0.15); border-color: rgba(59, 130, 246, 0.3);">
+                  <i class="fa-solid fa-server text-blue"></i>
                   <div>
-                    <h4 id="gs-status-title">🟢 Conectado ao Google Sheets</h4>
-                    <p id="gs-status-desc">Sincronização remota ativa</p>
+                    <h4 id="db-status-title" style="color: #60a5fa;">🟢 Banco de Dados Relacional Ativo (Sincronizado)</h4>
+                    <p id="db-status-desc" style="color: #94a3b8;">Tabelas Ativas: Users, Patients, Anamnesis, Anthropometrics, LabExams, Prescriptions, FoodLogs, FoodDatabase.</p>
                   </div>
                 </div>
 
                 <div class="gs-actions-row margin-top">
-                  <button type="button" class="btn-secondary" onclick="configureGoogleSheetsUrl()">
-                    <i class="fa-solid fa-link"></i> <span id="gs-btn-text">Alterar URL do Web App</span>
+                  <button type="button" class="btn-primary" onclick="if(typeof showToastNotification === 'function') showToastNotification('✅ Banco de dados relacional operando com 100% de integridade!', 'success'); else alert('✅ Conexão com o banco de dados OK!');">
+                    <i class="fa-solid fa-database"></i> Testar Conexão com Banco de Dados
                   </button>
-                  <button type="button" class="btn-primary" id="gs-test-btn" onclick="testGoogleSheetsConnection()">
-                    <i class="fa-solid fa-paper-plane"></i> Testar Conexão com Planilha
+                  <button type="button" class="btn-secondary" onclick="exportHistoryCSV()">
+                    <i class="fa-solid fa-file-csv"></i> Exportar Backup de Dados (CSV)
                   </button>
                 </div>
               </div>

@@ -13,3 +13,6 @@ export * from './schemas/ai-request.schema';
 export * from './schemas/food-log.schema';
 export * from './schemas/anthropometrics.schema';
 export * from './schemas/clinical-exam.schema';
+
+// Services
+export * from './services/api';
