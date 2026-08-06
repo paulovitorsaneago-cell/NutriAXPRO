@@ -667,7 +667,7 @@ function updateDietSummaryCards() {
 // RENDERIZAÇÃO DO PLANO ALIMENTAR (LAYOUT VERTICAL LARGURA DA PÁGINA)
 // ==========================================================================
 function renderDietMeals() {
-  const container = document.getElementById('meals-list');
+  const container = document.getElementById('meals-list') || document.getElementById('aba08-diet-list-container');
   if (!container) return;
 
   // Use prescribedMeals if present, or default to AppData.meals
