@@ -3714,41 +3714,125 @@ window.FastingEngine = {
     this.updateTimerDisplay();
   },
 
+  toggleFast: function() {
+    this.toggle();
+  },
+
+  showProtocolModal: function() {
+    const state = this.getState();
+    const newProtocol = prompt("Escolha o Protocolo de Jejum (16:8, 18:6, 20:4, 24h):", state.protocol || "16:8");
+    if (newProtocol) {
+      this.onProtocolChange(newProtocol.trim());
+    }
+  },
+
   updateTimerDisplay: function() {
     const state = this.getState();
-    const display = document.getElementById('fasting-timer-display');
+    const display = document.getElementById('fasting-countdown-timer') || document.getElementById('fasting-timer-display');
     const progressBar = document.getElementById('fasting-progress-bar');
+    const badge = document.getElementById('fasting-status-badge');
+    const btnToggle = document.getElementById('btn-toggle-fast');
+    const protoName = document.getElementById('fasting-protocol-name');
+    const pctEl = document.getElementById('fasting-progress-percent');
+    const startEl = document.getElementById('fasting-start-time');
+    const endEl = document.getElementById('fasting-end-time');
+
+    const targetH = state.targetHours || 16;
+    if (protoName) protoName.innerText = state.protocol || '16:8';
+    if (startEl) startEl.innerText = state.startTime ? new Date(state.startTime).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '20:00';
+    if (endEl) endEl.innerText = `${targetH}h (${state.protocol || '16:8'})`;
+
+    if (btnToggle) {
+      if (state.isFasting) {
+        btnToggle.innerHTML = `<i class="fa-solid fa-square"></i> Concluir Jejum`;
+        btnToggle.style.background = 'linear-gradient(135deg, #dc2626, #991b1b)';
+      } else {
+        btnToggle.innerHTML = `<i class="fa-solid fa-play"></i> Iniciar Jejum`;
+        btnToggle.style.background = 'linear-gradient(135deg, #059669, #10b981)';
+      }
+    }
+
+    if (badge) {
+      if (state.isFasting) {
+        badge.className = 'badge-status success';
+        badge.innerHTML = `<i class="fa-solid fa-moon"></i> Janela de Jejum Ativa (${state.protocol || '16:8'})`;
+      } else {
+        badge.className = 'badge-status info';
+        badge.innerHTML = `<i class="fa-solid fa-utensils text-amber"></i> Janela Alimentar Aberta`;
+      }
+    }
+
     if (!display) return;
 
     if (!state.isFasting || !state.startTime) {
       display.innerText = '00:00:00';
       if (progressBar) progressBar.style.width = '0%';
+      if (pctEl) pctEl.innerText = 'Pausado (0%)';
       return;
     }
 
     const startMs = new Date(state.startTime).getTime();
+    const targetMs = startMs + (targetH * 3600 * 1000);
     const nowMs = Date.now();
+    const remainingMs = Math.max(0, targetMs - nowMs);
     const elapsedSec = Math.floor((nowMs - startMs) / 1000);
+    const remainingSec = Math.floor(remainingMs / 1000);
 
-    const hours = Math.floor(elapsedSec / 3600);
-    const minutes = Math.floor((elapsedSec % 3600) / 60);
-    const seconds = elapsedSec % 60;
+    const hours = Math.floor(remainingSec / 3600);
+    const minutes = Math.floor((remainingSec % 3600) / 60);
+    const seconds = remainingSec % 60;
 
     const pad = n => String(n).padStart(2, '0');
     display.innerText = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 
-    const targetSec = (state.targetHours || 16) * 3600;
-    const progressPct = Math.min(100, (elapsedSec / targetSec) * 100);
+    const targetSec = targetH * 3600;
+    const progressPct = Math.min(100, Math.max(0, (elapsedSec / targetSec) * 100));
+
+    if (pctEl) pctEl.innerText = `${progressPct.toFixed(1)}% concluído`;
 
     if (progressBar) {
       progressBar.style.width = `${progressPct.toFixed(1)}%`;
       if (progressPct >= 100) {
         progressBar.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
       } else {
-        progressBar.style.background = 'linear-gradient(90deg, #a855f7, #3b82f6)';
+        progressBar.style.background = 'linear-gradient(90deg, #059669, #10b981)';
       }
     }
   }
+};
+
+window.calculateDailyAdherenceScore = function(dateKey) {
+  const dateStr = dateKey || (typeof getSelectedDateKey === 'function' ? getSelectedDateKey() : new Date().toISOString().split('T')[0]);
+  const logs = typeof loadFoodLogsForDate === 'function' ? loadFoodLogsForDate(dateStr) : [];
+  const fastingState = window.FastingEngine ? window.FastingEngine.getState() : { isFasting: false };
+
+  const prescribedMeals = (AppData.prescribedMeals && AppData.prescribedMeals.length > 0) ? AppData.prescribedMeals : AppData.meals || [];
+
+  if (prescribedMeals.length === 0) return { score: 100, label: '100%', status: 'Perfeito' };
+
+  let totalMeals = prescribedMeals.length;
+  let completedMeals = 0;
+  let fastingExemptMeals = 0;
+
+  prescribedMeals.forEach(meal => {
+    const isMealLogged = logs.some(l => l.mealId === meal.id || (l.name && l.name.toLowerCase().includes((meal.title || '').toLowerCase())));
+    if (isMealLogged) {
+      completedMeals++;
+    } else if (fastingState.isFasting) {
+      fastingExemptMeals++;
+    }
+  });
+
+  const netMeals = Math.max(1, totalMeals - fastingExemptMeals);
+  const scorePct = Math.min(100, Math.round((completedMeals / netMeals) * 100));
+
+  return {
+    score: scorePct,
+    label: scorePct + '%',
+    completedMeals: completedMeals,
+    fastingExemptMeals: fastingExemptMeals,
+    totalMeals: totalMeals
+  };
 };
 
 window.toggleFastingState = function() {
