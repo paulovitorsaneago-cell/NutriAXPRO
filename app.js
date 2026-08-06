@@ -670,22 +670,57 @@ function renderDietMeals() {
   const container = document.getElementById('meals-list') || document.getElementById('aba08-diet-list-container');
   if (!container) return;
 
-  // Use prescribedMeals if present, or default to AppData.meals
+  if (!AppData.meals || AppData.meals.length === 0) {
+    AppData.meals = [
+      {
+        id: 'meal_1',
+        title: 'Café da Manhã Habitual',
+        time: '08:00',
+        targetKcal: 650,
+        foods: [
+          { id: 'f1', name: 'Café com leite desnatado (200ml)', qty: '1 xícara', kcal: 90, protein: 6, carbs: 9, fats: 3 },
+          { id: 'f2', name: 'Pão francês com ovo mexido e queijo (150g)', qty: '1 unidade', kcal: 380, protein: 22, carbs: 32, fats: 18 },
+          { id: 'f3', name: 'Mamão Papaia (100g)', qty: '1/2 unidade', kcal: 45, protein: 1, carbs: 11, fats: 0 }
+        ]
+      },
+      {
+        id: 'meal_2',
+        title: 'Almoço Habitual',
+        time: '12:30',
+        targetKcal: 850,
+        foods: [
+          { id: 'f4', name: 'Arroz branco cozido (150g)', qty: '1 escumadeira', kcal: 190, protein: 4, carbs: 42, fats: 1 },
+          { id: 'f5', name: 'Feijão carioca cozido (100g)', qty: '1 concha', kcal: 76, protein: 5, carbs: 14, fats: 1 },
+          { id: 'f6', name: 'Peito de frango grelhado (180g)', qty: '1 filé grande', kcal: 295, protein: 55, carbs: 0, fats: 7 },
+          { id: 'f7', name: 'Salada verde com azeite de oliva (10g)', qty: 'Prato fundo', kcal: 110, protein: 2, carbs: 4, fats: 10 }
+        ]
+      },
+      {
+        id: 'meal_3',
+        title: 'Lanche da Tarde / Pré-Treino',
+        time: '16:30',
+        targetKcal: 550,
+        foods: [
+          { id: 'f8', name: 'Iogurte natural com aveia em flocos e banana', qty: '1 tigela', kcal: 280, protein: 12, carbs: 45, fats: 6 },
+          { id: 'f9', name: 'Whey Protein Concentrado (30g)', qty: '1 scoop', kcal: 120, protein: 24, carbs: 3, fats: 2 }
+        ]
+      },
+      {
+        id: 'meal_4',
+        title: 'Jantar Habitual',
+        time: '20:00',
+        targetKcal: 790,
+        foods: [
+          { id: 'f10', name: 'Omelete de 3 ovos com queijo e frango desfiado (250g)', qty: '1 porção', kcal: 420, protein: 42, carbs: 4, fats: 26 },
+          { id: 'f11', name: 'Mandioca cozida com azeite (150g)', qty: '1 porção', kcal: 240, protein: 2, carbs: 48, fats: 5 }
+        ]
+      }
+    ];
+  }
+
   let mealsToRender = (AppData.prescribedMeals && AppData.prescribedMeals.length > 0) 
     ? AppData.prescribedMeals 
     : AppData.meals;
-
-  if (!mealsToRender || mealsToRender.length === 0) {
-    container.innerHTML = `
-      <div style="width: 100%; text-align: center; padding: 3rem; background: rgba(15, 23, 42, 0.6); border: 1px dashed rgba(255,255,255,0.15); border-radius: 16px;">
-        <i class="fa-solid fa-wand-magic-sparkles text-purple" style="font-size: 2.5rem; margin-bottom: 0.5rem;"></i>
-        <h3 style="color: #f8fafc; font-size: 1.1rem; margin-bottom: 0.25rem;">Nenhuma refeição na prescrição atual</h3>
-        <p style="color: #cbd5e1; font-size: 0.85rem; margin-bottom: 1rem;">Clique no botão "🤖 Gerar Rascunho com IA" para montar o cardápio automático ou em "＋ Adicionar Refeição".</p>
-      </div>
-    `;
-    updateDietSummaryCards();
-    return;
-  }
 
   const activeRole = (typeof window.getUserRole === 'function') ? window.getUserRole() : 'patient';
 
@@ -3128,6 +3163,12 @@ window.switchNutriTab = function(tabName, btn) {
         b.classList.add('active');
       }
     });
+  }
+
+  if (tabName === 'dieta' || tabName === 'perfil') {
+    if (typeof renderDietMeals === 'function') {
+      setTimeout(() => { renderDietMeals(); }, 50);
+    }
   }
 };
 
