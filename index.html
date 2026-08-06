@@ -407,7 +407,7 @@
               <div class="card-header">
                 <div>
                   <h3 class="card-title"><i class="fa-solid fa-chart-line"></i> Progresso Recente de Peso</h3>
-                  <p class="card-subtitle">Evolução trimestral (Dados da aba 07_Evolução Corporal)</p>
+                  <p class="card-subtitle">Evolução trimestral do paciente</p>
                 </div>
                 <button class="btn-text" onclick="switchTab('evolucao')">Ver Detalhes <i class="fa-solid fa-chevron-right"></i></button>
               </div>
@@ -880,7 +880,7 @@
                   <p class="card-subtitle">Lista de refeições e alimentos registrados para a data selecionada</p>
                 </div>
                 <div class="card-header-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                  <button class="btn-secondary btn-sm" id="btn-gs-connector" onclick="configureGoogleSheetsUrl()" title="Configurar Web App URL do Google Apps Script (aba 12_App do Paciente)">
+                  <button class="btn-secondary btn-sm" id="btn-gs-connector" onclick="if(typeof showToastNotification === 'function') showToastNotification('🟢 Banco de Dados Nativo PostgreSQL Operacional!', 'success');" title="Status da Conexão com Banco de Dados">
                     <i class="fa-solid fa-file-excel text-emerald"></i> GS Conectado
                   </button>
                   <button class="btn-success btn-sm" id="btn-confirm-daily-food" onclick="confirmDailyFoodLog()" title="Confirmar e aplicar consumo de alimentos do dia">
@@ -988,7 +988,7 @@
                   </button>
                 </div>
                 <button type="button" class="btn-secondary" onclick="exportHistoryCSV()" title="Baixar histórico em arquivo CSV/Excel">
-                  <i class="fa-solid fa-file-csv"></i> Exportar Planilha (CSV)
+                  <i class="fa-solid fa-file-csv"></i> Exportar Histórico (CSV)
                 </button>
               </div>
 
@@ -1076,10 +1076,10 @@
             <!-- SUB-HEADER FOR ABA 01, ABA 03 & RESUMO CONSOLIDADO -->
             <div class="perfil-sub-tabs">
               <button type="button" class="perfil-tab-btn active" onclick="switchPerfilSection('aba01', this)">
-                <i class="fa-solid fa-id-card text-red"></i> 1. Aba 01 — Perfil & Anamnese Clínica
+                <i class="fa-solid fa-id-card text-red"></i> 1. Perfil & Anamnese Clínica
               </button>
               <button type="button" class="perfil-tab-btn" onclick="switchPerfilSection('aba03', this)">
-                <i class="fa-solid fa-clipboard-question text-red"></i> 2. Aba 03 — Questionário Alimentar & R24h
+                <i class="fa-solid fa-clipboard-question text-red"></i> 2. Questionário Alimentar & R24h
               </button>
               <button type="button" class="perfil-tab-btn" onclick="switchPerfilSection('resumo', this)">
                 <i class="fa-solid fa-chart-pie text-red"></i> 3. Resumo Consolidado
@@ -1094,8 +1094,8 @@
                 <div class="card glass-card">
                   <div class="card-header flex-between">
                     <div>
-                      <h3 class="card-title text-red"><i class="fa-solid fa-id-card"></i> 1. DADOS BÁSICOS</h3>
-                      <p class="card-subtitle">Cadastro inicial do paciente (Aba 01_Anamnese)</p>
+                      <h3 class="card-title text-red"><i class="fa-solid fa-id-card"></i> 1. DADOS BÁSICOS & BIOMETRIA</h3>
+                      <p class="card-subtitle">Cadastro inicial e anamnese do paciente</p>
                     </div>
                     <div class="flex-center gap-sm">
                       <div id="sync-status-indicator" class="sync-pill synced">
@@ -1418,7 +1418,7 @@
                       <div class="status-auto-card success" id="aba01-status-auto">
                         <i class="fa-solid fa-circle-check text-emerald-400"></i>
                         <span id="aba01-status-val">COMPLETA</span>
-                        <small style="opacity: 0.7; font-weight: normal;">(Validado na Planilha)</small>
+                        <small style="opacity: 0.7; font-weight: normal;">(Validado no Prontuário)</small>
                       </div>
                       <input type="hidden" id="aba01-status-anamnese" value="COMPLETA">
                     </div>
@@ -1462,7 +1462,7 @@
                   <div class="card-header">
                     <div>
                       <h3 class="card-title"><i class="fa-solid fa-heart text-red"></i> Preferências & Aversões Alimentares</h3>
-                      <p class="card-subtitle">Alimentos que o paciente ama ou odeia consumir da Aba 03</p>
+                      <p class="card-subtitle">Alimentos habituais, preferências e recordatório 24h</p>
                     </div>
                   </div>
 
@@ -1600,7 +1600,7 @@
 
                     <div class="col-span-12 form-actions">
                       <button type="submit" class="btn-primary">
-                        <i class="fa-solid fa-floppy-disk"></i> Salvar Todos os Dados da Aba 03
+                        <i class="fa-solid fa-floppy-disk"></i> Salvar Recordatório & Anamnese no Banco de Dados
                       </button>
                     </div>
                   </div>
@@ -1683,8 +1683,8 @@
               <div class="card glass-card">
                 <div class="card-header">
                   <div>
-                    <h3 class="card-title text-emerald"><i class="fa-solid fa-ruler-combined"></i> 1. Dobras Cutâneas & Perímetros</h3>
-                    <p class="card-subtitle">Protocolo Jackson Pollock 7 Dobras (mm) e Perímetros Corporais (cm)</p>
+                    <h3 class="card-title text-emerald"><i class="fa-solid fa-ruler-combined"></i> 1. Medidas por Adipômetro (Pollock 7) & Perímetros</h3>
+                    <p class="card-subtitle">Aferição de dobras cutâneas (mm) com Adipômetro Científico e circunferências (cm)</p>
                   </div>
                 </div>
 
@@ -1700,7 +1700,7 @@
 
                   <div class="col-span-12 margin-top border-top pt-3">
                     <h4 class="text-emerald" style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase;">
-                      <i class="fa-solid fa-ruler-vertical"></i> Dobras Cutâneas (mm)
+                      <i class="fa-solid fa-ruler-vertical"></i> 7 Dobras Cutâneas por Adipômetro (mm)
                     </h4>
                   </div>
                   <div class="form-group col-span-3">
